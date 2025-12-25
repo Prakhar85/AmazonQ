@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Q for Infor LN Development</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            padding: 60px 0;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .nav-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .nav-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .nav-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .nav-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .nav-description {
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-features li {
+            padding: 5px 0;
+            color: #555;
+        }
+
+        .nav-features li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 40px 0;
+            opacity: 0.8;
+        }
+
+        .github-link {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .github-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .announcements-section { background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: none; }
+        .announcements-container h2 { color: #667eea; margin-bottom: 20px; font-size: 1.5rem; }
+        .announcement-item { background: #f8f9fa; border-left: 4px solid #667eea; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .announcement-item.warning { border-left-color: #ffc107; }
+        .announcement-item.error { border-left-color: #dc3545; }
+        .announcement-item.success { border-left-color: #28a745; }
+        .announcement-title { font-weight: bold; color: #333; margin-bottom: 8px; }
+        .announcement-date { font-size: 0.9rem; color: #666; margin-bottom: 8px; }
+        .announcement-message { color: #555; line-height: 1.5; }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-card {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fab fa-aws"></i> Amazon Q for Infor LN</h1>
+            <p>Accelerate your Infor LN development with AI-powered code generation, intelligent assistance, and comprehensive 4GL support</p>
+        </header>
+
+        <section id="announcements-section" class="announcements-section">
+            <div class="announcements-container">
+                <h2><i class="fas fa-bullhorn"></i> Announcements</h2>
+                <div id="announcements-list"></div>
+            </div>
+        </section>
+
+        <section class="demo-section">
+			<h4 class="prompt-title">Amazon Q</h4>
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Tell me everything from master rules that you can do for me - show complete Amazon Q capabilities for 4GL development.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Amazon Q Capabilities - Complete Overview</div>
+                </div>
+                <div class="ide-content">
+                    <pre><code id="code-output" class="language-c code-editor"></code></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <section class="nav-grid">
+            <a href="Web/capabilities-overview.html" class="nav-card full-width">
+                <div class="nav-icon"><i class="fab fa-aws"></i></div>
+                <div class="nav-title">All Capabilities Overview</div>
+                <div class="nav-description">Complete overview of Amazon Q capabilities for Infor LN development</div>
+                <ul class="nav-features">
+                    <li>50+ rule files coverage</li>
+                    <li>15+ development categories</li>
+                    <li>100+ use cases</li>
+                    <li>Complete 4GL suite</li>
+                </ul>
+            </a>
+
+            <a href="Web/generic-4gl.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-code"></i></div>
+                <div class="nav-title">Generic 4GL Code</div>
+                <div class="nav-description">Generate any 4GL code with proper syntax and validation</div>
+                <ul class="nav-features">
+                    <li>Complete function generation</li>
+                    <li>Business logic implementation</li>
+                    <li>Proper error handling</li>
+                    <li>Best practices compliance</li>
+                </ul>
+            </a>
+
+            <a href="Web/usecases.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-tasks"></i></div>
+                <div class="nav-title">Use Cases</div>
+                <div class="nav-description">Comprehensive collection of task-based development scenarios</div>
+                <ul class="nav-features">
+                    <li>E-Invoice & Tax Integration</li>
+                    <li>BOD & API Integration</li>
+                    <li>Employee & HR Systems</li>
+                    <li>Manufacturing & BOM</li>
+                </ul>
+            </a>
+
+            <a href="Web/metadata-generation.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-cogs"></i></div>
+                <div class="nav-title">Metadata Generation</div>
+                <div class="nav-description">Generate tables, sessions, labels, messages, and questions</div>
+                <ul class="nav-features">
+                    <li>Complete XML structure</li>
+                    <li>Message code analysis</li>
+                    <li>Multi-language support</li>
+                    <li>Template-based generation</li>
+                </ul>
+            </a>
+
+            <a href="Web/endpoint-policies.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-exchange-alt"></i></div>
+                <div class="nav-title">Endpoint Policies</div>
+                <div class="nav-description">Transform JSON, XML, SOAP with mapping policies</div>
+                <ul class="nav-features">
+                    <li>JSON to XML conversion</li>
+                    <li>SOAP envelope handling</li>
+                    <li>Field mapping rules</li>
+                    <li>Error response policies</li>
+                </ul>
+            </a>
+
+            <a href="Web/public-interfaces.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-plug"></i></div>
+                <div class="nav-title">Public Interfaces</div>
+                <div class="nav-description">LN Public Interface integrations for business processes</div>
+                <ul class="nav-features">
+                    <li>Sales order approval</li>
+                    <li>Purchase order processing</li>
+                    <li>Invoice validation</li>
+                    <li>Workflow integration</li>
+                </ul>
+            </a>
+
+            <a href="Web/json-parsing.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-code"></i></div>
+                <div class="nav-title">JSON Parsing</div>
+                <div class="nav-description">Create and parse JSON with 4GL functions</div>
+                <ul class="nav-features">
+                    <li>JSON creation from parameters</li>
+                    <li>Robust parsing with validation</li>
+                    <li>Array and nested handling</li>
+                    <li>Memory management</li>
+                </ul>
+            </a>
+
+            <a href="Web/xml-parsing.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-file-code"></i></div>
+                <div class="nav-title">XML Parsing</div>
+                <div class="nav-description">Generate and parse XML with namespace support</div>
+                <ul class="nav-features">
+                    <li>XML creation and parsing</li>
+                    <li>Namespace handling</li>
+                    <li>SOAP envelope support</li>
+                    <li>BOD XML processing</li>
+                </ul>
+            </a>
+
+            <a href="Web/reports-development.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="nav-title">Reports Development</div>
+                <div class="nav-description">Comprehensive report generation with formatting</div>
+                <ul class="nav-features">
+                    <li>Multi-table aggregation</li>
+                    <li>Excel with colors/charts</li>
+                    <li>Professional layouts</li>
+                    <li>Performance optimization</li>
+                </ul>
+            </a>
+
+            <a href="Web/extensions-development.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-puzzle-piece"></i></div>
+                <div class="nav-title">Extensions Development</div>
+                <div class="nav-description">BOD, Table, Session, Menu, Report, Process extensions</div>
+                <ul class="nav-features">
+                    <li>BOD UserArea extensions</li>
+                    <li>Table field additions</li>
+                    <li>Process workflow hooks</li>
+                    <li>Custom validation logic</li>
+                </ul>
+            </a>
+
+            <a href="Web/3gl-scripts.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-terminal"></i></div>
+                <div class="nav-title">3GL Scripts</div>
+                <div class="nav-description">Process management and system automation scripts</div>
+                <ul class="nav-features">
+                    <li>Process lifecycle control</li>
+                    <li>Wait and activate patterns</li>
+                    <li>Batch processing workflows</li>
+                    <li>System integration</li>
+                </ul>
+            </a>
+
+            <a href="Web/table-operations.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-table"></i></div>
+                <div class="nav-title">Table Operations & DAL</div>
+                <div class="nav-description">Master 4GL table operations with proper DAL patterns</div>
+                <ul class="nav-features">
+                    <li>CRUD operations with validation</li>
+                    <li>Mandatory field checking</li>
+                    <li>Proper error handling</li>
+                    <li>Enum domain usage</li>
+                </ul>
+            </a>
+
+            <a href="Web/odata-apis.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-cloud"></i></div>
+                <div class="nav-title">OData REST APIs</div>
+                <div class="nav-description">Create complete LN REST API services</div>
+                <ul class="nav-features">
+                    <li>OData schema generation</li>
+                    <li>DLL implementation</li>
+                    <li>Entity types & actions</li>
+                    <li>Complex type handling</li>
+                </ul>
+            </a>
+
+            <a href="Web/rest-integration.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-exchange-alt"></i></div>
+                <div class="nav-title">REST API Integration</div>
+                <div class="nav-description">Integrate with external systems via REST APIs</div>
+                <ul class="nav-features">
+                    <li>OAuth2 authentication</li>
+                    <li>HTTP methods (GET/POST/PUT)</li>
+                    <li>Query parameter handling</li>
+                    <li>Response processing</li>
+                </ul>
+            </a>
+
+            <a href="Web/dal-development.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-layer-group"></i></div>
+                <div class="nav-title">DAL Development</div>
+                <div class="nav-description">Data Access Layer with object hooks and field validation</div>
+                <ul class="nav-features">
+                    <li>Object-level hooks</li>
+                    <li>Field dependencies</li>
+                    <li>Business methods</li>
+                    <li>Validation rules</li>
+                </ul>
+            </a>
+
+            <a href="Web/dll-development.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-cogs"></i></div>
+                <div class="nav-title">DLL Development</div>
+                <div class="nav-description">Create Dynamic Link Libraries for system integration</div>
+                <ul class="nav-features">
+                    <li>REST API integration</li>
+                    <li>OData service DLLs</li>
+                    <li>BOD processing</li>
+                    <li>Parameter validation</li>
+                </ul>
+            </a>
+
+            <a href="Web/ui-scripts.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-desktop"></i></div>
+                <div class="nav-title">UI Scripts Development</div>
+                <div class="nav-description">Interactive user interface scripts with validation</div>
+                <ul class="nav-features">
+                    <li>Form field validation</li>
+                    <li>Dynamic field behavior</li>
+                    <li>Data lookup integration</li>
+                    <li>Event handling</li>
+                </ul>
+            </a>
+
+            <a href="Web/trusted-functions.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-code-branch"></i></div>
+                <div class="nav-title">Trusted Functions Library</div>
+                <div class="nav-description">Comprehensive reference for validated 4GL functions</div>
+                <ul class="nav-features">
+                    <li>Core & database functions</li>
+                    <li>HTTP & network functions</li>
+                    <li>JSON & XML functions</li>
+                    <li>String operations</li>
+                </ul>
+            </a>
+
+            <a href="Web/predefined-functions.html" class="nav-card">
+                <div class="nav-icon"><i class="fas fa-calculator"></i></div>
+                <div class="nav-title">Predefined Functions</div>
+                <div class="nav-description">Most commonly used 4GL predefined functions with examples</div>
+                <ul class="nav-features">
+                    <li>200+ total functions</li>
+                    <li>50+ most used functions</li>
+                    <li>8 major categories</li>
+                    <li>Complete syntax examples</li>
+                </ul>
+            </a>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 Amazon Web Services. Amazon Q for Infor LN Development.</p>
+        <a href="https://oxford.awsdev.infor.com/ln-technology/amazonqforln" class="github-link" target="_blank">
+            <i class="fab fa-github"></i> View on GitLab
+        </a>
+    </footer>
+    <script>
+        const code = `Amazon Q Master 4GL Rules - Complete Capabilities Overview
+==========================================================
+
+🚀 CORE 4GL DEVELOPMENT
+├── DAL & Table Operations
+│   ├── Complete CRUD operations with validation
+│   ├── Object and field hooks (before/after)
+│   ├── Business methods and dependencies
+│   ├── Mandatory field validation
+│   └── Enum domain compliance
+│
+├── 4GL Script Generation
+│   ├── Function creation with proper syntax
+│   ├── Parameter alignment (one per line)
+│   ├── Variable initialization (tt.init.vars)
+│   ├── Error handling patterns
+│   └── Best practices enforcement
+│
+└── Functions & Libraries
+    ├── Trusted function usage (50+ functions)
+    ├── DLL creation and usage
+    ├── BOD-DLL functions
+    └── Auto-function validation
+
+🌐 API & INTEGRATION
+├── LN REST API/OData
+│   ├── OData schema generation
+│   ├── Entity types and actions
+│   ├── DLL implementation
+│   └── Process session integration
+│
+├── REST API Integration
+│   ├── HTTP methods (GET/POST/PUT/DELETE)
+│   ├── OAuth2 authentication
+│   ├── Bearer token management
+│   └── Query parameter handling
+│
+└── JSON/XML Processing
+    ├── JSON parsing and generation
+    ├── XML parsing with namespaces
+    ├── SOAP envelope handling
+    └── Dynamic memory management
+
+🔧 EXTENSIONS & CUSTOMIZATIONS
+├── BOD Extensions
+│   ├── Outgoing BOD extensions
+│   ├── UserArea field addition
+│   ├── Identifier handling
+│   └── Hook extraction
+│
+├── Session Extensions
+│   ├── Session extension development
+│   ├── Menu extensions
+│   ├── Report extensions
+│   └── Process extensions
+│
+└── Public Interfaces
+    ├── Sales order interfaces
+    ├── Purchase order interfaces
+    ├── Invoice processing
+    └── Account management
+
+📊 SPECIALIZED FEATURES
+├── Reports & Analytics
+│   ├── Multi-table queries
+│   ├── Excel reports with colors
+│   ├── Professional layouts
+│   └── Performance optimization
+│
+├── Server SQL
+│   ├── Complex SQL queries
+│   ├── Performance optimization
+│   ├── Company number handling
+│   └── Error state management
+│
+└── 3GL Scripts
+    ├── Process lifecycle control
+    ├── Wait and activate patterns
+    ├── Batch processing workflows
+    └── System integration
+
+🏗️ METADATA GENERATION
+├── Tables (complete XML definitions)
+├── Sessions (process session templates)
+├── Labels (multi-language support)
+├── Messages (error handling)
+└── Questions (user interactions)
+
+🔄 INTEGRATION POLICIES
+├── API Connection Mapping
+├── Endpoint Policies
+│   ├── JSON to XML conversion
+│   ├── XML to JSON conversion
+│   ├── SOAP transformations
+│   └── Error response handling
+└── Special Character Handling
+
+🇮🇳 SPECIALIZED USE CASES
+├── E-invoice India (GST compliance)
+├── DA Workflow integration
+├── Employee ID retrieval
+├── Email integration
+├── Document management
+└── Bearer token API integration
+
+📋 AUTOMATIC FEATURES
+├── Rule file loading (50+ files)
+├── Syntax validation
+├── Error prevention
+├── Performance optimization
+├── Memory management
+├── Security best practices
+└── Code review compliance
+
+💡 KEY BENEFITS
+✓ Zero hardcoded values - all parameterized
+✓ One variable per line compliance
+✓ Automatic error handling
+✓ Enum domain validation
+✓ Transaction safety
+✓ Performance optimized
+✓ Security compliant
+✓ Best practices enforced
+
+Just describe what you need - Amazon Q automatically:
+→ Loads relevant rule files
+→ Generates proper 4GL syntax
+→ Includes validation & error handling
+→ Follows all coding standards
+→ Provides complete working solutions
+
+Ready to accelerate your 4GL development! 🚀`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                    if (currentIndex % 100 === 0) Prism.highlightElement(output);
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                    Prism.highlightElement(output);
+                }
+            }, 20);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+
+        // Load announcements
+        function loadAnnouncements() {
+            // Hardcoded announcements data (replace fetch due to CORS)
+            const announcementsData = {
+                "announcements": [
+                    {
+                        "id": 1,
+                        "title": "New Predefined Functions Library Added",
+                        "message": "Comprehensive collection of 200+ 4GL predefined functions now available with interactive examples.",
+                        "type": "info",
+                        "date": "2024-01-15",
+                        "active": false
+                    }
+                ]
+            };
+            
+            const activeAnnouncements = announcementsData.announcements.filter(a => a.active);
+            const section = document.getElementById('announcements-section');
+            const list = document.getElementById('announcements-list');
+            
+            if (activeAnnouncements.length > 0) {
+                list.innerHTML = activeAnnouncements.map(announcement => `
+                    <div class="announcement-item ${announcement.type}">
+                        <div class="announcement-title">${announcement.title}</div>
+                        <div class="announcement-date">${new Date(announcement.date).toLocaleDateString()}</div>
+                        <div class="announcement-message">${announcement.message}</div>
+                    </div>
+                `).join('');
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        // Load announcements on page load
+        window.addEventListener('load', loadAnnouncements);
+    </script>
