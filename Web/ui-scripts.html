@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Scripts Development - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 40px; padding: 40px 0; }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: white; text-decoration: none; margin-bottom: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 25px; transition: background 0.3s ease; }
+        .back-link:hover { background: rgba(255,255,255,0.3); }
+        .content-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .section-title { font-size: 1.8rem; color: #667eea; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .example-prompt { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 15px 0; border-radius: 5px; }
+        .example-prompt h4 { color: #667eea; margin-bottom: 10px; }
+        .prompt-text { font-style: italic; color: #555; margin-bottom: 10px; }
+        .files-loaded { background: #e8f5e8; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
+        .files-loaded strong { color: #28a745; }
+        .capability-list { list-style: none; padding: 0; }
+        .capability-list li { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .capability-list li:before { content: "⚡ "; color: #667eea; font-weight: bold; }
+        .highlight-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-desktop"></i> UI Scripts Development</h1>
+            <p>Create interactive user interface scripts for LN sessions with validation and dynamic behavior</p>
+        </header>
+
+        <div class="content-card">
+            <h2 class="section-title">UI Script Capabilities</h2>
+            <ul class="capability-list">
+                <li>Form field validation and formatting</li>
+                <li>Dynamic field behavior and dependencies</li>
+                <li>User interaction event handling</li>
+                <li>Data lookup and auto-completion</li>
+                <li>Custom business logic integration</li>
+                <li>Error message display and handling</li>
+                <li>Session navigation and control</li>
+                <li>Real-time data updates</li>
+            </ul>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Form Field Validation</h4>
+                <div class="prompt-text">
+                    "Create UI script for customer form validation. Validate customer code format, check for duplicates, and enable/disable fields based on customer type selection."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4gl-core-syntax.md, 4gl-validation.md, 4GL_Table_Operations_Guide.md, enum-domain-assignment-rules.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Dynamic Field Dependencies</h4>
+                <div class="prompt-text">
+                    "Generate UI script for purchase order form with dynamic field dependencies. Show/hide fields based on order type, validate vendor selection, and calculate totals automatically."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4gl-core-syntax.md, 4GL_Table_Operations_Guide.md, enum-domain-assignment-rules.md, 4gl-validation.md, 4gl-advanced-patterns.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Data Lookup Integration</h4>
+                <div class="prompt-text">
+                    "Create UI script with data lookup functionality. Implement auto-complete for item codes, validate item availability, and populate related fields automatically."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4gl-core-syntax.md, 4GL_Table_Operations_Guide.md, 4gl-validation.md, dynamic-memory-string-rules.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+        </div>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Create UI script for customer form validation. Validate customer code format, check for duplicates, and enable/disable fields based on customer type selection.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">UI Scripts - Customer Form Validation</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-magic"></i> Key Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">✓ Real-time field validation</li>
+                    <li style="padding: 5px 0;">✓ Dynamic form behavior</li>
+                    <li style="padding: 5px 0;">✓ Data lookup integration</li>
+                    <li style="padding: 5px 0;">✓ Error handling and messaging</li>
+                    <li style="padding: 5px 0;">✓ Business logic enforcement</li>
+                    <li style="padding: 5px 0;">✓ User experience optimization</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = `|4GL Process Session - Customer Data Processing
+|Script Type: 123
+
+declaration:
+	#pragma used dll "otcextextapi"
+	table ttccom100
+	#include <bic_4gl2>
+	#include <bic_dam>
+
+	|Form fields
+	extern domain tccom.bpid f.customer.code
+	extern domain tccom.bpid t.customer.code
+	extern domain tccom.bpty f.customer.type
+	extern domain tcyesno f.validate.only
+	extern domain tcyesno f.error.report
+
+group.1:
+init.group:
+	get.screen.defaults()
+
+|Field events with proper validation
+field.f.customer.code:
+before.display:
+	set.fmin(f.customer.code)
+
+when.field.changes:
+	if not isspace(f.customer.code) then
+		if not is.valid.customer.code(f.customer.code) then
+			message("Invalid customer code format")
+			input.again()
+		endif
+		
+		select tccom100.bpid
+		from   tccom100
+		where  tccom100._index1 = {:f.customer.code}
+		selectdo
+			t.customer.code = f.customer.code
+		selectempty
+			message("Customer not found")
+			input.again()
+		endselect
+	endif
+
+field.t.customer.code:
+before.display:
+	set.fmax(t.customer.code)
+
+field.f.customer.type:
+selection.filter:
+	query.extend.where.in.zoom("tccom.bpty.stat = tccom.stat.active")
+
+when.field.changes:
+	if f.customer.type = tccom.bpty.customer then
+		message("Customer type selected")
+	endif
+
+|Choice events for UI buttons
+choice.func.validate:
+on.choice:
+	string l.error(256)
+	if validate.input.fields(l.error) <> 0 then
+		message(l.error)
+		choice.again()
+	else
+		message("Validation successful")
+	endif
+
+choice.func.process:
+on.choice:
+	string l.error(256)
+	if process.customer.data(l.error) <> 0 then
+		message(l.error)
+	else
+		message("Processing completed")
+	endif
+
+|Functions section
+functions:
+
+function long validate.input.fields(
+	ref string o.error
+)
+{
+FunctionUsage
+	Expl:	Validate user input fields
+	Output:	o.error - Error message
+	Return:	long - 0 = success, 1 = error
+EndFunctionUsage
+
+	tt.init.vars(o.error)
+
+	if isspace(f.customer.code) then
+		o.error = "Customer code is required"
+		return(1)
+	endif
+
+	return(0)
+}
+
+function boolean is.valid.customer.code(
+	domain tccom.bpid i.customer.code
+)
+{
+	long l.i
+	string l.char(1)
+
+	if len(i.customer.code) < 3 then
+		return(false)
+	endif
+
+	for l.i = 1 to len(i.customer.code)
+		l.char = mid$(i.customer.code, l.i, 1)
+		if not (isalpha(l.char) or isdigit(l.char)) then
+			return(false)
+		endif
+	endfor
+
+	return(true)
+}
+
+function long process.customer.data(
+	ref string o.error
+)
+{
+	tt.init.vars(o.error)
+
+	select tccom100.bpid,
+	       tccom100.nama
+	from   tccom100
+	where  tccom100.bpid >= {:f.customer.code}
+	and    tccom100.bpid <= {:t.customer.code}
+	selectdo
+		|Process customer record
+	endselect
+
+	return(0)
+}`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

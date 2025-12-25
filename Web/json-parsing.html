@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Parsing - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .json-operations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .operation-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .operation-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .operation-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .code-sample {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .json-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .flow-box {
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-code"></i> JSON Parsing</h1>
+            <p>Generate 4GL code for JSON creation, parsing, and manipulation</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Give 4GL code for below JSON request body to create in LN: {"test":"test"}. Take all values for all JSON key fields as input to the function. Load necessary files from master rules.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">JSON Parsing - Creation and Parsing</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">JSON Operations</h2>
+            <div class="json-operations">
+                <div class="operation-item">
+                    <i class="fas fa-plus-circle"></i>
+                    <h4>JSON Creation</h4>
+                    <p>Build JSON from input parameters and variables</p>
+                </div>
+                <div class="operation-item">
+                    <i class="fas fa-search"></i>
+                    <h4>JSON Parsing</h4>
+                    <p>Extract values from JSON into output variables</p>
+                </div>
+                <div class="operation-item">
+                    <i class="fas fa-list"></i>
+                    <h4>Array Handling</h4>
+                    <p>Process JSON arrays and nested structures</p>
+                </div>
+                <div class="operation-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Safety Checks</h4>
+                    <p>Validation and error handling for JSON operations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts - JSON Creation</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Simple JSON Creation</h4>
+                <div class="prompt-text">
+                    "Give 4GL code for below JSON request body to create in LN: {'test':'test'}. Take all values for all JSON key fields as input to the function. Load necessary files from master rules."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON_Functions_Compact_Guide.md, 4gl-core-syntax.md, dynamic-memory-string-rules.md, 4gl-error-handling-rules.md, parameter-declaration-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Complex JSON with Arrays</h4>
+                <div class="prompt-text">
+                    "Generate 4GL code to create JSON: {'customer': {'name': 'John', 'orders': [{'id': '001', 'amount': 100}, {'id': '002', 'amount': 200}]}}. Take all values as input parameters."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON_Functions_Compact_Guide.md, dynamic-memory-string-rules.md, 4gl-advanced-patterns.md, parameter-declaration-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: E-commerce Order JSON</h4>
+                <div class="prompt-text">
+                    "Create 4GL code for e-commerce order JSON with customer details, shipping address, line items array, tax calculations, and payment information. All values as input parameters."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON_Functions_Compact_Guide.md, 4gl-validation.md, enum-domain-assignment-rules.md, dynamic-memory-string-rules.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts - JSON Parsing</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Simple JSON Parsing</h4>
+                <div class="prompt-text">
+                    "Give 4GL code to read all values for below JSON request body and store them in output variables: {'test':'test'}. Store array fields in appropriate output arrays."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON_Functions_Compact_Guide.md, 4gl-core-syntax.md, dynamic-memory-string-rules.md, parameter-declaration-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: API Response Parsing</h4>
+                <div class="prompt-text">
+                    "Generate 4GL code to parse API response JSON with customer data, order history array, and nested address information. Extract all fields into properly typed output variables."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON_Functions_Compact_Guide.md, 4gl-api-http.md, dynamic-memory-string-rules.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Bulk Data Processing</h4>
+                <div class="prompt-text">
+                    "Create 4GL code to parse large JSON with multiple record arrays, validate each record, and store valid records in output arrays while logging errors for invalid ones."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON_Functions_Compact_Guide.md, 4gl-advanced-patterns.md, 4gl-validation.md, api-logging-pattern.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">JSON Processing Flow</h2>
+            
+            <h4 style="color: #667eea; margin-bottom: 15px;">JSON Creation Flow:</h4>
+            <div class="json-flow">
+                <div class="flow-box">Input Parameters</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">JSON Builder</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">JSON String</div>
+            </div>
+
+            <h4 style="color: #667eea; margin: 30px 0 15px;">JSON Parsing Flow:</h4>
+            <div class="json-flow">
+                <div class="flow-box">JSON String</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">JSON Parser</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Output Variables</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Sample JSON Structures</h2>
+            
+            <h4 style="color: #667eea; margin-bottom: 15px;">Simple JSON:</h4>
+            <div class="code-sample">
+{
+  "test": "test"
+}
+            </div>
+
+            <h4 style="color: #667eea; margin: 20px 0 15px;">Complex JSON with Arrays:</h4>
+            <div class="code-sample">
+{
+  "customer": {
+    "id": "CUST001",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "orders": [
+      {
+        "orderId": "ORD001",
+        "amount": 150.75,
+        "items": [
+          {"product": "Laptop", "qty": 1},
+          {"product": "Mouse", "qty": 2}
+        ]
+      }
+    ]
+  }
+}
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> JSON Processing Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🔧 Dynamic JSON creation from parameters</li>
+                    <li style="padding: 5px 0;">📖 Robust JSON parsing with validation</li>
+                    <li style="padding: 5px 0;">📊 Array and nested object handling</li>
+                    <li style="padding: 5px 0;">🛡️ Error handling and safety checks</li>
+                    <li style="padding: 5px 0;">💾 Memory management for large JSON</li>
+                    <li style="padding: 5px 0;">🔍 Type validation and conversion</li>
+                    <li style="padding: 5px 0;">⚡ Performance optimized operations</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">JSON Function Categories</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Creation Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>json.create()</li>
+                        <li>json.add.field()</li>
+                        <li>json.add.array()</li>
+                        <li>json.add.object()</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Parsing Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>json.parse()</li>
+                        <li>json.get.field()</li>
+                        <li>json.get.array()</li>
+                        <li>json.get.object()</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Utility Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>json.validate()</li>
+                        <li>json.exists()</li>
+                        <li>json.count()</li>
+                        <li>json.cleanup()</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const code = `| JSON Creation and Parsing Functions
+| Using correct 4GL JSON functions from JSON_Functions_Compact_Guide.md
+
+function extern long create.json.from.input(
+	string			i.test.value(256),
+	ref	string		o.json.output(32000)mb,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.json.root
+	string	l.error(512)
+	
+	tt.init.vars(
+		l.ret,
+		l.json.root,
+		l.error,
+		o.json.output,
+		o.error
+	)
+	
+	|Validate input parameter
+	if isspace(i.test.value) then
+		o.error = "Test value is required for JSON creation"
+		return(-12)
+	endif
+	
+	|Create JSON object using correct function
+	l.json.root = Json.newObject()
+	if l.json.root = 0 then
+		o.error = "Failed to create JSON object"
+		return(-12)
+	endif
+	
+	|Add field to JSON using correct function
+	Json.setString(l.json.root, "test", i.test.value)
+	
+	|Convert to JSON string using correct function
+	l.ret = Json.writeString(l.json.root, o.json.output)
+	if l.ret <> 0 then
+		o.error = "Failed to convert JSON to string"
+		Json.delete(l.json.root)
+		return(-12)
+	endif
+	
+	|Cleanup memory
+	Json.delete(l.json.root)
+	
+	return(0)
+}
+
+function extern long parse.json.to.output(
+	string			i.json.input(32000)mb,
+	ref	string		o.test.value(256),
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.json.root
+	string	l.error(512)
+	
+	tt.init.vars(
+		l.ret,
+		l.json.root,
+		l.error,
+		o.test.value,
+		o.error
+	)
+	
+	|Validate input JSON
+	if isspace(i.json.input) then
+		o.error = "JSON input is required for parsing"
+		return(-12)
+	endif
+	
+	|Parse JSON string using correct function
+	l.json.root = Json.readString(i.json.input, l.error)
+	if l.json.root = 0 then
+		o.error = "Invalid JSON format: " + l.error
+		return(-12)
+	endif
+	
+	|Check if field exists before extraction
+	if not Json.has(l.json.root, "test") then
+		o.error = "Field 'test' not found in JSON"
+		Json.delete(l.json.root)
+		return(-12)
+	endif
+	
+	|Extract test field value using correct function
+	o.test.value = Json.getString(l.json.root, "test")
+	
+	|Validate extracted value
+	if isspace(o.test.value) then
+		o.error = "Test field value is empty in JSON"
+		Json.delete(l.json.root)
+		return(-12)
+	endif
+	
+	|Cleanup memory
+	Json.delete(l.json.root)
+	
+	return(0)
+}
+
+function extern long create.complex.json(
+	string			i.customer.name(100),
+	string			i.customer.id(20),
+	long			i.order.count,
+	ref	string		o.json.output(32000)mb,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.json.root
+	long	l.customer.object
+	long	l.orders.array
+	long	l.order.object
+	long	l.index
+	string	l.order.id(20)
+	
+	tt.init.vars(
+		l.ret,
+		l.json.root,
+		l.customer.object,
+		l.orders.array,
+		l.order.object,
+		l.index,
+		l.order.id,
+		o.json.output,
+		o.error
+	)
+	
+	|Create main JSON object
+	l.json.root = Json.newObject()
+	if l.json.root = 0 then
+		o.error = "Failed to create root JSON object"
+		return(-12)
+	endif
+	
+	|Create customer object
+	l.customer.object = Json.newObject()
+	if l.customer.object = 0 then
+		o.error = "Failed to create customer object"
+		Json.delete(l.json.root)
+		return(-12)
+	endif
+	
+	|Add customer fields
+	Json.setString(l.customer.object, "name", i.customer.name)
+	Json.setString(l.customer.object, "id", i.customer.id)
+	
+	|Create orders array
+	l.orders.array = Json.newArray()
+	if l.orders.array = 0 then
+		o.error = "Failed to create orders array"
+		Json.delete(l.json.root)
+		return(-12)
+	endif
+	
+	|Add orders to array
+	for l.index = 1 to i.order.count
+		l.order.object = Json.newObject()
+		if l.order.object <> 0 then
+			l.order.id = "ORD" + str$(l.index, "###")
+			Json.setString(l.order.object, "orderId", l.order.id)
+			Json.setNumber(l.order.object, "amount", l.index * 100.0)
+			Json.add(l.orders.array, l.order.object)
+		endif
+	endfor
+	
+	|Add orders array to customer
+	Json.set(l.customer.object, "orders", l.orders.array)
+	
+	|Add customer to root
+	Json.set(l.json.root, "customer", l.customer.object)
+	
+	|Convert to string
+	l.ret = Json.writeString(l.json.root, o.json.output)
+	if l.ret <> 0 then
+		o.error = "Failed to convert complex JSON to string"
+		Json.delete(l.json.root)
+		return(-12)
+	endif
+	
+	|Cleanup memory
+	Json.delete(l.json.root)
+	
+	return(0)
+}
+
+function extern long parse.complex.json(
+	string			i.json.input(32000)mb,
+	ref	string		o.customer.name(100),
+	ref	string		o.customer.id(20),
+	ref	long		o.order.count,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.json.root
+	long	l.customer.object
+	long	l.orders.array
+	long	l.order.object
+	long	l.index
+	string	l.error(512)
+	
+	tt.init.vars(
+		l.ret,
+		l.json.root,
+		l.customer.object,
+		l.orders.array,
+		l.order.object,
+		l.index,
+		l.error,
+		o.customer.name,
+		o.customer.id,
+		o.order.count,
+		o.error
+	)
+	
+	|Parse JSON string
+	l.json.root = Json.readString(i.json.input, l.error)
+	if l.json.root = 0 then
+		o.error = "Invalid JSON format: " + l.error
+		return(-12)
+	endif
+	
+	|Get customer object
+	if Json.has(l.json.root, "customer") then
+		l.customer.object = Json.get(l.json.root, "customer")
+		if l.customer.object <> 0 then
+			|Extract customer fields
+			if Json.has(l.customer.object, "name") then
+				o.customer.name = Json.getString(l.customer.object, "name")
+			endif
+			
+			if Json.has(l.customer.object, "id") then
+				o.customer.id = Json.getString(l.customer.object, "id")
+			endif
+			
+			|Get orders array
+			if Json.has(l.customer.object, "orders") then
+				l.orders.array = Json.get(l.customer.object, "orders")
+				if l.orders.array <> 0 then
+					o.order.count = Json.count(l.orders.array)
+				endif
+			endif
+		endif
+	else
+		o.error = "Customer object not found in JSON"
+		Json.delete(l.json.root)
+		return(-12)
+	endif
+	
+	|Cleanup memory
+	Json.delete(l.json.root)
+	
+	return(0)
+}
+
+| JSON Function Reference (from JSON_Functions_Compact_Guide.md):
+| Json.newObject() - Create new JSON object
+| Json.newArray() - Create new JSON array
+| Json.setString() - Set string value
+| Json.setNumber() - Set number value
+| Json.getString() - Get string value
+| Json.getNumber() - Get number value
+| Json.has() - Check if key exists
+| Json.get() - Get JSON object/array
+| Json.set() - Set JSON object/array
+| Json.add() - Add to array
+| Json.count() - Get array/object count
+| Json.readString() - Parse JSON from string
+| Json.writeString() - Convert JSON to string
+| Json.delete() - Free JSON memory`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

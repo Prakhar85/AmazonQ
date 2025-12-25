@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Cases - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 40px; padding: 40px 0; }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: white; text-decoration: none; margin-bottom: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 25px; transition: background 0.3s ease; }
+        .back-link:hover { background: rgba(255,255,255,0.3); }
+        .content-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .section-title { font-size: 1.8rem; color: #667eea; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .usecase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin: 20px 0; }
+        .usecase-item { background: #f8f9fa; padding: 25px; border-radius: 15px; border-left: 4px solid #667eea; transition: all 0.3s ease; }
+        .usecase-item:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .usecase-item h4 { color: #667eea; margin-bottom: 15px; font-size: 1.2rem; }
+        .usecase-item p { color: #555; margin-bottom: 15px; font-size: 0.95rem; }
+        .usecase-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .tag { background: #667eea; color: white; padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; }
+        .highlight-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 15px; margin: 25px 0; }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+        .category-header { background: #e9ecef; padding: 15px 25px; border-radius: 10px; margin: 30px 0 20px 0; border-left: 5px solid #667eea; }
+        .category-header h3 { color: #667eea; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-tasks"></i> Use Cases</h1>
+            <p>Comprehensive collection of task-based development scenarios and implementation patterns</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Generate code for E-Invoice GST integration for India. Include tax calculation, invoice validation, and government portal submission with proper error handling.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Use Cases - E-Invoice GST Integration</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <div class="category-header">
+                <h3><i class="fas fa-receipt"></i> E-Invoice & Tax Integration</h3>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-item">
+                    <h4>E-Invoice GST Integration (India)</h4>
+                    <p>Complete GST compliance solution for Indian e-invoicing requirements including tax calculation, invoice validation, and government portal integration.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">GST</span>
+                        <span class="tag">Tax Calculation</span>
+                        <span class="tag">Government API</span>
+                        <span class="tag">Compliance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="category-header">
+                <h3><i class="fas fa-cogs"></i> Integration Use Cases</h3>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-item">
+                    <h4>BOD Publishing</h4>
+                    <p>Business Object Document publishing patterns for enterprise integration scenarios with proper XML handling and error management.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">BOD</span>
+                        <span class="tag">XML</span>
+                        <span class="tag">Integration</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>BOD ExecuteMethod XML Conversion</h4>
+                    <p>Convert BOD ExecuteMethod calls to XML format for system integration and data exchange processes.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">BOD</span>
+                        <span class="tag">XML Conversion</span>
+                        <span class="tag">ExecuteMethod</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Custom DAL Workflow</h4>
+                    <p>Implement custom Data Access Layer workflows for complex business process automation and validation.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">DAL</span>
+                        <span class="tag">Workflow</span>
+                        <span class="tag">Automation</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>DA Workflow Status Check</h4>
+                    <p>Document approval workflow status checking and management for business process control.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Document Approval</span>
+                        <span class="tag">Workflow</span>
+                        <span class="tag">Status Check</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Database Conversion</h4>
+                    <p>Database migration and conversion utilities for data transformation and system upgrades.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Database</span>
+                        <span class="tag">Migration</span>
+                        <span class="tag">Conversion</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Document Management</h4>
+                    <p>Document storage, retrieval, and management system integration with proper file handling.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Documents</span>
+                        <span class="tag">File Management</span>
+                        <span class="tag">Storage</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Excel Color Report Generation</h4>
+                    <p>Generate Excel reports with color formatting, charts, and advanced styling for business reporting.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Excel</span>
+                        <span class="tag">Reports</span>
+                        <span class="tag">Color Formatting</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Excel HTML Reports</h4>
+                    <p>Create HTML-formatted Excel reports with embedded styling and interactive elements.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Excel</span>
+                        <span class="tag">HTML</span>
+                        <span class="tag">Interactive Reports</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Bearer Token API Integration</h4>
+                    <p>Generate and manage Bearer tokens for secure API authentication and integration scenarios.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">API</span>
+                        <span class="tag">Bearer Token</span>
+                        <span class="tag">Authentication</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Label Generation</h4>
+                    <p>Automated label generation for products, shipping, and inventory management with barcode support.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Labels</span>
+                        <span class="tag">Barcode</span>
+                        <span class="tag">Automation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="category-header">
+                <h3><i class="fas fa-user-tie"></i> Employee & HR Use Cases</h3>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-item">
+                    <h4>Employee ID Retrieval</h4>
+                    <p>Retrieve employee information and ID management for HR and payroll integration systems.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Employee</span>
+                        <span class="tag">HR</span>
+                        <span class="tag">ID Management</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="category-header">
+                <h3><i class="fas fa-envelope"></i> Communication Use Cases</h3>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-item">
+                    <h4>Email Integration</h4>
+                    <p>Email sending, receiving, and processing integration with attachment handling and template support.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Email</span>
+                        <span class="tag">SMTP</span>
+                        <span class="tag">Templates</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="category-header">
+                <h3><i class="fas fa-code"></i> Programming Patterns</h3>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-item">
+                    <h4>Enum Case Statement</h4>
+                    <p>Proper enum handling and case statement patterns for domain value processing and validation.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Enum</span>
+                        <span class="tag">Case Statement</span>
+                        <span class="tag">Domain Values</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Parameter Session</h4>
+                    <p>Parameter session implementation for user input collection and validation in interactive forms.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Parameter Session</span>
+                        <span class="tag">User Input</span>
+                        <span class="tag">Validation</span>
+                    </div>
+                </div>
+                <div class="usecase-item">
+                    <h4>Text Field Operations</h4>
+                    <p>Text field manipulation, validation, and processing for large text content and document handling.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">Text Fields</span>
+                        <span class="tag">Text Processing</span>
+                        <span class="tag">Validation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="category-header">
+                <h3><i class="fas fa-sitemap"></i> Manufacturing Use Cases</h3>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-item">
+                    <h4>BOM Explosion</h4>
+                    <p>Bill of Materials explosion and component analysis for manufacturing and production planning.</p>
+                    <div class="usecase-tags">
+                        <span class="tag">BOM</span>
+                        <span class="tag">Manufacturing</span>
+                        <span class="tag">Component Analysis</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-lightbulb"></i> Use Case Benefits</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Ready-to-Use Solutions</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0;">✓ Pre-built implementation patterns</li>
+                            <li style="padding: 5px 0;">✓ Tested and validated code</li>
+                            <li style="padding: 5px 0;">✓ Best practice examples</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Business Integration</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0;">✓ Real-world scenarios</li>
+                            <li style="padding: 5px 0;">✓ Industry-specific solutions</li>
+                            <li style="padding: 5px 0;">✓ Compliance requirements</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Development Efficiency</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0;">✓ Faster implementation</li>
+                            <li style="padding: 5px 0;">✓ Reduced development time</li>
+                            <li style="padding: 5px 0;">✓ Consistent code quality</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = `|E-Invoice GST Integration for India - Complete Implementation
+|Based on E-Invoicing_GST_Integration_UseCase.md
+
+|=== GST TAX CALCULATION ===
+
+function long calculate.gst.tax(
+\tdomain tcamnt01 i.taxable.amount,
+\tdomain tcmcs.str10m i.gst.rate,
+\tref domain tcamnt01 o.cgst.amount,
+\tref domain tcamnt01 o.sgst.amount,
+\tref domain tcamnt01 o.igst.amount,
+\tref domain tcmcs.str999m o.error
+)
+{
+\tdouble l.gst.percentage
+\tdouble l.tax.amount
+\tlong l.ret
+\t
+\ttt.init.vars(
+\t\tl.gst.percentage,
+\t\tl.tax.amount,
+\t\tl.ret,
+\t\to.cgst.amount,
+\t\to.sgst.amount,
+\t\to.igst.amount,
+\t\to.error
+\t)
+\t
+\t|Convert GST rate to percentage
+\tl.gst.percentage = val(i.gst.rate)
+\t
+\tif l.gst.percentage <= 0 then
+\t\to.error = "Invalid GST rate: " & i.gst.rate
+\t\treturn(-12)
+\tendif
+\t
+\t|Calculate total tax amount
+\tl.tax.amount = (i.taxable.amount * l.gst.percentage) / 100
+\t
+\t|For intra-state transactions (CGST + SGST)
+\tif is.intra.state.transaction() then
+\t\to.cgst.amount = l.tax.amount / 2
+\t\to.sgst.amount = l.tax.amount / 2
+\t\to.igst.amount = 0
+\telse
+\t\t|For inter-state transactions (IGST)
+\t\to.cgst.amount = 0
+\t\to.sgst.amount = 0
+\t\to.igst.amount = l.tax.amount
+\tendif
+\t
+\treturn(0)
+}
+
+|=== E-INVOICE VALIDATION ===
+
+function long validate.einvoice.data(
+\tdomain tcmcs.str20m i.invoice.number,
+\tdomain tcmcs.str15m i.gstin,
+\tdomain tcamnt01 i.invoice.amount,
+\tref domain tcmcs.str999m o.error
+)
+{
+\ttt.init.vars(o.error)
+\t
+\t|Validate invoice number format
+\tif isspace(i.invoice.number) then
+\t\to.error = "Invoice number is mandatory"
+\t\treturn(-12)
+\tendif
+\t
+\t|Validate GSTIN format (15 characters)
+\tif len(i.gstin) <> 15 then
+\t\to.error = "GSTIN must be 15 characters: " & i.gstin
+\t\treturn(-12)
+\tendif
+\t
+\t|Validate invoice amount
+\tif i.invoice.amount <= 0 then
+\t\to.error = "Invoice amount must be positive"
+\t\treturn(-12)
+\tendif
+\t
+\t|Additional GST validation rules
+\tif not is.valid.gstin.format(i.gstin) then
+\t\to.error = "Invalid GSTIN format: " & i.gstin
+\t\treturn(-12)
+\tendif
+\t
+\treturn(0)
+}
+
+|=== GOVERNMENT PORTAL SUBMISSION ===
+
+function long submit.einvoice.to.portal(
+\tdomain tcmcs.str999m i.invoice.json,
+\tref domain tcmcs.str100m o.irn.number,
+\tref domain tcmcs.str999m o.error
+)
+{
+\tlong l.ret
+\tlong l.header.list
+\tstring l.response.body(9999)
+\tstring l.auth.token(512)
+\t
+\ttt.init.vars(
+\t\tl.ret,
+\t\tl.header.list,
+\t\tl.response.body,
+\t\tl.auth.token,
+\t\to.irn.number,
+\t\to.error
+\t)
+\t
+\t|Get authentication token
+\tl.ret = get.gst.portal.auth.token(l.auth.token, o.error)
+\tif l.ret <> 0 then
+\t\treturn(-12)
+\tendif
+\t
+\t|Setup HTTP headers
+\tl.header.list = http.headerlist.new()
+\thttp.headerlist.add(l.header.list, "Content-Type", "application/json")
+\thttp.headerlist.add(l.header.list, "Authorization", "Bearer " & l.auth.token)
+\t
+\t|Submit to GST portal
+\tl.ret = http.post(
+\t\t"https://api.einvoice.gov.in/v1/invoice",
+\t\tHTTP_HEADERLIST,
+\t\tl.header.list,
+\t\tHTTP_REQUESTBODYSTRING,
+\t\ti.invoice.json,
+\t\tHTTP_RESPONSEBODYSTRING,
+\t\tl.response.body
+\t)
+\t
+\tif l.ret <> 0 then
+\t\to.error = "Failed to submit e-invoice: HTTP " & str$(l.ret)
+\t\treturn(-12)
+\tendif
+\t
+\t|Parse response to get IRN
+\tl.ret = parse.einvoice.response(l.response.body, o.irn.number, o.error)
+\tif l.ret <> 0 then
+\t\treturn(-12)
+\tendif
+\t
+\treturn(0)
+}
+
+|=== HELPER FUNCTIONS ===
+
+function boolean is.intra.state.transaction()
+{
+\t|Check if buyer and seller are in same state
+\t|Implementation based on state codes
+\treturn(true)  |Simplified for demo
+}
+
+function boolean is.valid.gstin.format(
+\tdomain tcmcs.str15m i.gstin
+)
+{
+\t|Validate GSTIN checksum and format
+\t|First 2 chars: State code
+\t|Next 10 chars: PAN
+\t|12th char: Entity code
+\t|13th char: Z (default)
+\t|14th char: Alphanumeric
+\t|15th char: Check digit
+\t
+\tif len(i.gstin) <> 15 then
+\t\treturn(false)
+\tendif
+\t
+\t|Additional format validation logic here
+\treturn(true)
+}`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Parsing - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .xml-operations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .operation-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .operation-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .operation-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .code-sample {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .xml-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .flow-box {
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .xml-sample {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-file-code"></i> XML Parsing</h1>
+            <p>Generate 4GL code for XML creation, parsing, and manipulation</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Give 4GL code for below XML request body to create in LN: &lt;test&gt;&lt;test1&gt;haha&lt;/test1&gt;&lt;/test&gt;. Take all values for all XML fields as input to the function. Load necessary files from master rules.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">XML Parsing - Creation and Parsing</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">XML Operations</h2>
+            <div class="xml-operations">
+                <div class="operation-item">
+                    <i class="fas fa-plus-circle"></i>
+                    <h4>XML Creation</h4>
+                    <p>Build XML from input parameters and data structures</p>
+                </div>
+                <div class="operation-item">
+                    <i class="fas fa-search"></i>
+                    <h4>XML Parsing</h4>
+                    <p>Extract values from XML into output variables</p>
+                </div>
+                <div class="operation-item">
+                    <i class="fas fa-sitemap"></i>
+                    <h4>Namespace Handling</h4>
+                    <p>Process XML with namespaces and prefixes</p>
+                </div>
+                <div class="operation-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Validation</h4>
+                    <p>XML structure validation and error handling</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts - XML Creation</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Simple XML Creation</h4>
+                <div class="prompt-text">
+                    "Give 4GL code for below XML request body to create in LN: &lt;test&gt;&lt;test1&gt;haha&lt;/test1&gt;&lt;/test&gt;. Take all values for all XML fields as input to the function. Load necessary files from master rules."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_XML_Functions_Compact_Template.md, 4gl-core-syntax.md, dynamic-memory-string-rules.md, 4gl-error-handling-rules.md, parameter-declaration-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Complex XML with Attributes</h4>
+                <div class="prompt-text">
+                    "Generate 4GL code to create XML with attributes and nested elements: &lt;Order id='001' date='2024-01-01'&gt;&lt;Customer name='John'/&gt;&lt;Items&gt;&lt;Item code='A001' qty='5'/&gt;&lt;/Items&gt;&lt;/Order&gt;. All values as input parameters."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_XML_Functions_Complete_Guide.md, dynamic-memory-string-rules.md, 4gl-advanced-patterns.md, parameter-declaration-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: SOAP Envelope Creation</h4>
+                <div class="prompt-text">
+                    "Create 4GL code for SOAP XML envelope with headers, body, and fault handling. Include namespace declarations and authentication elements."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_XML_Functions_Complete_Guide.md, 4gl-api-http.md, JSON-to-SOAP-Transform.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts - XML Parsing</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Simple XML Parsing</h4>
+                <div class="prompt-text">
+                    "Give 4GL code to read all values for below XML request body and store them in output variables: &lt;test&gt;&lt;test1&gt;haha&lt;/test1&gt;&lt;/test&gt;. Store array fields in appropriate output arrays."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_XML_Functions_Compact_Template.md, 4gl-core-syntax.md, dynamic-memory-string-rules.md, parameter-declaration-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Web Service Response Parsing</h4>
+                <div class="prompt-text">
+                    "Generate 4GL code to parse web service XML response with customer data, order arrays, and error handling. Extract all elements and attributes into typed output variables."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_XML_Functions_Complete_Guide.md, 4gl-api-http.md, dynamic-memory-string-rules.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: BOD XML Processing</h4>
+                <div class="prompt-text">
+                    "Create 4GL code to parse incoming BOD XML with multiple business objects, validate structure, and extract data for LN table updates."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_XML_Functions_Complete_Guide.md, BOD_Extension_Development_Guide.md, 4gl-validation.md, 4gl-advanced-patterns.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">XML Processing Flow</h2>
+            
+            <h4 style="color: #667eea; margin-bottom: 15px;">XML Creation Flow:</h4>
+            <div class="xml-flow">
+                <div class="flow-box">Input Parameters</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">XML Builder</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">XML Document</div>
+            </div>
+
+            <h4 style="color: #667eea; margin: 30px 0 15px;">XML Parsing Flow:</h4>
+            <div class="xml-flow">
+                <div class="flow-box">XML Document</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">XML Parser</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Output Variables</div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Sample XML Structures</h2>
+            
+            <h4 style="color: #667eea; margin-bottom: 15px;">Simple XML:</h4>
+            <div class="xml-sample">
+&lt;test&gt;
+  &lt;test1&gt;haha&lt;/test1&gt;
+&lt;/test&gt;
+            </div>
+
+            <h4 style="color: #667eea; margin: 20px 0 15px;">Complex XML with Attributes:</h4>
+            <div class="xml-sample">
+&lt;Order id="ORD001" date="2024-01-01"&gt;
+  &lt;Customer id="CUST001" name="John Doe"&gt;
+    &lt;Address&gt;
+      &lt;Street&gt;123 Main St&lt;/Street&gt;
+      &lt;City&gt;New York&lt;/City&gt;
+      &lt;Country&gt;USA&lt;/Country&gt;
+    &lt;/Address&gt;
+  &lt;/Customer&gt;
+  &lt;Items&gt;
+    &lt;Item code="LAPTOP001" qty="1" price="999.99"&gt;
+      &lt;Description&gt;Gaming Laptop&lt;/Description&gt;
+    &lt;/Item&gt;
+    &lt;Item code="MOUSE001" qty="2" price="25.50"&gt;
+      &lt;Description&gt;Wireless Mouse&lt;/Description&gt;
+    &lt;/Item&gt;
+  &lt;/Items&gt;
+&lt;/Order&gt;
+            </div>
+
+            <h4 style="color: #667eea; margin: 20px 0 15px;">SOAP Envelope:</h4>
+            <div class="xml-sample">
+&lt;soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+  &lt;soap:Header&gt;
+    &lt;auth:Authentication xmlns:auth="http://example.com/auth"&gt;
+      &lt;auth:Username&gt;user123&lt;/auth:Username&gt;
+      &lt;auth:Password&gt;pass123&lt;/auth:Password&gt;
+    &lt;/auth:Authentication&gt;
+  &lt;/soap:Header&gt;
+  &lt;soap:Body&gt;
+    &lt;ws:GetCustomer xmlns:ws="http://example.com/webservice"&gt;
+      &lt;ws:CustomerId&gt;CUST001&lt;/ws:CustomerId&gt;
+    &lt;/ws:GetCustomer&gt;
+  &lt;/soap:Body&gt;
+&lt;/soap:Envelope&gt;
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> XML Processing Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🔧 Dynamic XML creation from parameters</li>
+                    <li style="padding: 5px 0;">📖 Robust XML parsing with validation</li>
+                    <li style="padding: 5px 0;">🏷️ Namespace and attribute handling</li>
+                    <li style="padding: 5px 0;">🛡️ Error handling and fault tolerance</li>
+                    <li style="padding: 5px 0;">💾 Memory management for large XML</li>
+                    <li style="padding: 5px 0;">🔍 XPath-like element selection</li>
+                    <li style="padding: 5px 0;">⚡ Performance optimized operations</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">XML Function Categories</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Creation Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>xml.create.document()</li>
+                        <li>xml.add.element()</li>
+                        <li>xml.add.attribute()</li>
+                        <li>xml.add.text()</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Parsing Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>xml.parse.document()</li>
+                        <li>xml.get.element()</li>
+                        <li>xml.get.attribute()</li>
+                        <li>xml.get.text()</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Navigation Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>xml.find.element()</li>
+                        <li>xml.get.children()</li>
+                        <li>xml.get.parent()</li>
+                        <li>xml.iterate.elements()</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">XML Standards Support</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center;">
+                    <h4 style="color: #28a745;">✓ XML 1.0</h4>
+                    <p style="font-size: 0.9rem;">Standard XML specification</p>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center;">
+                    <h4 style="color: #28a745;">✓ Namespaces</h4>
+                    <p style="font-size: 0.9rem;">XML namespace support</p>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center;">
+                    <h4 style="color: #28a745;">✓ SOAP</h4>
+                    <p style="font-size: 0.9rem;">SOAP envelope handling</p>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center;">
+                    <h4 style="color: #28a745;">✓ BOD</h4>
+                    <p style="font-size: 0.9rem;">Business Object Documents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const code = `| XML Creation and Parsing Functions
+| Using correct 4GL XML functions from 4GL_XML_Functions_Compact_Template.md
+
+function extern long create.xml.from.input(
+	string			i.test1.value(256),
+	ref	string		o.xml.output(32000)mb,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.xml.root
+	long	l.test.element
+	long	l.test1.element
+	string	l.error(512)
+	
+	tt.init.vars(
+		l.ret,
+		l.xml.root,
+		l.test.element,
+		l.test1.element,
+		l.error,
+		o.xml.output,
+		o.error
+	)
+	
+	|Validate input parameter
+	if isspace(i.test1.value) then
+		o.error = "Test1 value is required for XML creation"
+		return(-12)
+	endif
+	
+	|Create root element using correct function
+	l.test.element = xmlNewNode("test", XML_ELEMENT, 0)
+	if l.test.element = 0 then
+		o.error = "Failed to create root element"
+		return(-12)
+	endif
+	
+	|Create child element with data using correct function
+	l.test1.element = xmlNewDataElement("test1", i.test1.value, l.test.element)
+	if l.test1.element = 0 then
+		o.error = "Failed to create test1 element"
+		xmlDelete(l.test.element, 0)
+		return(-12)
+	endif
+	
+	|Convert XML to string using correct function
+	l.ret = xmlWriteToString(o.xml.output, l.test.element)
+	if l.ret <= 0 then
+		o.error = "Failed to convert XML to string"
+		xmlDelete(l.test.element, 0)
+		return(-12)
+	endif
+	
+	|Cleanup memory (MANDATORY)
+	xmlDelete(l.test.element, 0)
+	
+	return(0)
+}
+
+function extern long parse.xml.to.output(
+	string			i.xml.input(32000)mb,
+	ref	string		o.test1.value(256),
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.xml.root
+	long	l.test1.element
+	string	l.error(512)
+	
+	tt.init.vars(
+		l.ret,
+		l.xml.root,
+		l.test1.element,
+		l.error,
+		o.test1.value,
+		o.error
+	)
+	
+	|Validate input XML
+	if isspace(i.xml.input) then
+		o.error = "XML input is required for parsing"
+		return(-12)
+	endif
+	
+	|Parse XML string using correct function
+	l.xml.root = xmlReadFromString(i.xml.input, l.error)
+	if l.xml.root = 0 then
+		o.error = "Invalid XML format: " + l.error
+		return(-12)
+	endif
+	
+	|Find test1 element using correct function
+	l.test1.element = xmlFindFirst("test1", l.xml.root)
+	if l.test1.element = 0 then
+		o.error = "Element 'test1' not found in XML"
+		xmlDelete(l.xml.root, 0)
+		return(-12)
+	endif
+	
+	|Extract text content using correct function
+	o.test1.value = xmlData$(l.test1.element)
+	
+	|Validate extracted value
+	if isspace(o.test1.value) then
+		o.error = "Test1 element is empty in XML"
+		xmlDelete(l.xml.root, 0)
+		return(-12)
+	endif
+	
+	|Cleanup memory (MANDATORY)
+	xmlDelete(l.xml.root, 0)
+	
+	return(0)
+}
+
+function extern long create.order.xml.with.attributes(
+	string			i.order.id(20),
+	string			i.order.date(10),
+	string			i.customer.name(100),
+	long			i.item.count,
+	ref	string		o.xml.output(32000)mb,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.order.element
+	long	l.customer.element
+	long	l.items.element
+	long	l.item.element
+	long	l.index
+	string	l.item.code(20)
+	string	l.qty.str(10)
+	
+	tt.init.vars(
+		l.ret,
+		l.order.element,
+		l.customer.element,
+		l.items.element,
+		l.item.element,
+		l.index,
+		l.item.code,
+		l.qty.str,
+		o.xml.output,
+		o.error
+	)
+	
+	|Create Order root element
+	l.order.element = xmlNewNode("Order", XML_ELEMENT, 0)
+	if l.order.element = 0 then
+		o.error = "Failed to create Order element"
+		return(-12)
+	endif
+	
+	|Add attributes to Order element using correct function
+	xmlSetAttribute(l.order.element, "id", i.order.id)
+	xmlSetAttribute(l.order.element, "date", i.order.date)
+	
+	|Create Customer element with name attribute
+	l.customer.element = xmlNewNode("Customer", XML_ELEMENT, l.order.element)
+	if l.customer.element <> 0 then
+		xmlSetAttribute(l.customer.element, "name", i.customer.name)
+	endif
+	
+	|Create Items container element
+	l.items.element = xmlNewNode("Items", XML_ELEMENT, l.order.element)
+	if l.items.element = 0 then
+		o.error = "Failed to create Items element"
+		xmlDelete(l.order.element, 0)
+		return(-12)
+	endif
+	
+	|Add Item elements with attributes
+	for l.index = 1 to i.item.count
+		l.item.element = xmlNewNode("Item", XML_ELEMENT, l.items.element)
+		if l.item.element <> 0 then
+			l.item.code = "ITEM" + str$(l.index, "###")
+			l.qty.str = str$(l.index)
+			xmlSetAttribute(l.item.element, "code", l.item.code)
+			xmlSetAttribute(l.item.element, "qty", l.qty.str)
+		endif
+	endfor
+	
+	|Convert to string using correct function
+	l.ret = xmlWriteToString(o.xml.output, l.order.element)
+	if l.ret <= 0 then
+		o.error = "Failed to convert XML to string"
+		xmlDelete(l.order.element, 0)
+		return(-12)
+	endif
+	
+	|Cleanup memory (MANDATORY)
+	xmlDelete(l.order.element, 0)
+	
+	return(0)
+}
+
+function extern long parse.order.xml.with.attributes(
+	string			i.xml.input(32000)mb,
+	ref	string		o.order.id(20),
+	ref	string		o.customer.name(100),
+	ref	long		o.item.count,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.xml.root
+	long	l.order.element
+	long	l.customer.element
+	long	l.items.element
+	long	l.nodes
+	long	l.found.count
+	string	l.error(512)
+	
+	tt.init.vars(
+		l.ret,
+		l.xml.root,
+		l.order.element,
+		l.customer.element,
+		l.items.element,
+		l.nodes,
+		l.found.count,
+		l.error,
+		o.order.id,
+		o.customer.name,
+		o.item.count,
+		o.error
+	)
+	
+	|Parse XML string
+	l.xml.root = xmlReadFromString(i.xml.input, l.error)
+	if l.xml.root = 0 then
+		o.error = "Invalid XML format: " + l.error
+		return(-12)
+	endif
+	
+	|Find Order element
+	l.order.element = xmlFindFirst("Order", l.xml.root)
+	if l.order.element = 0 then
+		o.error = "Order element not found in XML"
+		xmlDelete(l.xml.root, 0)
+		return(-12)
+	endif
+	
+	|Extract Order attributes using correct function
+	o.order.id = xmlAttribute$(l.order.element, "id")
+	
+	|Find Customer element and extract name attribute
+	l.customer.element = xmlFindFirst("Customer", l.order.element)
+	if l.customer.element <> 0 then
+		o.customer.name = xmlAttribute$(l.customer.element, "name")
+	endif
+	
+	|Find Items element and count Item children
+	l.items.element = xmlFindFirst("Items", l.order.element)
+	if l.items.element <> 0 then
+		|Count Item elements using xmlFindNodes
+		l.nodes = xmlFindNodes(l.items.element, "Item", 0, l.found.count)
+		o.item.count = l.found.count
+	endif
+	
+	|Cleanup memory (MANDATORY)
+	xmlDelete(l.xml.root, 0)
+	
+	return(0)
+}
+
+| XML Function Reference (from 4GL_XML_Functions_Compact_Template.md):
+| xmlReadFromString() - Parse XML from string
+| xmlNewNode() - Create new XML element
+| xmlNewDataElement() - Create element with text content
+| xmlSetAttribute() - Set element attribute
+| xmlAttribute$() - Get element attribute
+| xmlData$() - Get element text content
+| xmlSetData() - Set element text content
+| xmlFindFirst() - Find first matching element
+| xmlFindNodes() - Find multiple matching elements
+| xmlWriteToString() - Convert XML to string
+| xmlDelete() - Free XML memory (MANDATORY cleanup)`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

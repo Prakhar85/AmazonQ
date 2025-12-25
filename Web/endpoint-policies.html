@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoint Policies - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .policy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .policy-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .policy-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .policy-item i {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .transform-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .transform-box {
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .transform-arrow {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .code-sample {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-exchange-alt"></i> Endpoint Policies</h1>
+            <p>Generate transformation policies for JSON, XML, SOAP, and error handling</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Create an Infor API Gateway endpoint policy for JSON to XML transformation. Use Handlebars template with proper XML escaping and field validation. Include error handling for missing fields.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Endpoint Policy - JSON to XML Transform</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">Available Policy Types</h2>
+            <div class="policy-grid">
+                <div class="policy-item">
+                    <i class="fas fa-code"></i>
+                    <h4>JSON to XML</h4>
+                    <p>Transform JSON requests to XML format with field mapping</p>
+                </div>
+                <div class="policy-item">
+                    <i class="fas fa-file-code"></i>
+                    <h4>XML to JSON</h4>
+                    <p>Convert XML data to JSON with structure preservation</p>
+                </div>
+                <div class="policy-item">
+                    <i class="fas fa-sync-alt"></i>
+                    <h4>JSON to JSON</h4>
+                    <p>Transform JSON structure and field mappings</p>
+                </div>
+                <div class="policy-item">
+                    <i class="fas fa-soap"></i>
+                    <h4>JSON to SOAP</h4>
+                    <p>Convert JSON to SOAP envelope format</p>
+                </div>
+                <div class="policy-item">
+                    <i class="fas fa-transform"></i>
+                    <h4>XML to XML</h4>
+                    <p>Transform XML structure and namespaces</p>
+                </div>
+                <div class="policy-item">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>Error Handling</h4>
+                    <p>Standardized error response policies</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: JSON to XML Transform Policy</h4>
+                <div class="prompt-text">
+                    "Create Infor API Gateway endpoint policy for JSON to XML transformation. Map customer fields with proper XML escaping and validation. Include error handling for missing required fields."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON-to-XML-Transform.md, Special-Character-Handling.md, Error-Response-Handling.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: XML to JSON with JSONPath</h4>
+                <div class="prompt-text">
+                    "Generate endpoint policy for XML to JSON conversion using JSONPath expressions. Handle SOAP response transformation with conditional logic and array processing."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> XML-to-JSON-Transform.md, JSON-to-JSON-Transform.md, Error-Response-Handling.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Complex Error Response Handler</h4>
+                <div class="prompt-text">
+                    "Create comprehensive error handling policy for API Gateway. Handle HTTP status codes, SOAP faults, validation errors, and business rule violations with standardized response format."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Error-Response-Handling.md, XML-to-JSON-Transform.md, JSON-to-JSON-Transform.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 4: JSON to SOAP Envelope</h4>
+                <div class="prompt-text">
+                    "Generate endpoint policy for JSON to SOAP transformation. Create proper SOAP envelope with headers, body, and authentication. Include namespace handling and fault processing."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> JSON-to-SOAP-Transform.md, XML-to-XML-Transform.md, Special-Character-Handling.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Transformation Flow</h2>
+            <div class="transform-flow">
+                <div class="transform-box">Input JSON</div>
+                <div class="transform-arrow">→</div>
+                <div class="transform-box">Policy Engine</div>
+                <div class="transform-arrow">→</div>
+                <div class="transform-box">Output XML</div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h4 style="color: #667eea; margin-bottom: 15px;">Sample Input JSON:</h4>
+                <div class="code-sample">
+{
+  "customer": {
+    "name": "John Doe",
+    "id": "CUST001",
+    "email": "john@example.com"
+  },
+  "order": {
+    "items": [
+      {"product": "Laptop", "qty": 1, "price": 999.99},
+      {"product": "Mouse", "qty": 2, "price": 25.50}
+    ]
+  }
+}
+                </div>
+                
+                <h4 style="color: #667eea; margin: 20px 0 15px;">Sample Output XML:</h4>
+                <div class="code-sample">
+&lt;Order&gt;
+  &lt;Customer&gt;
+    &lt;Name&gt;John Doe&lt;/Name&gt;
+    &lt;ID&gt;CUST001&lt;/ID&gt;
+    &lt;Email&gt;john@example.com&lt;/Email&gt;
+  &lt;/Customer&gt;
+  &lt;Items&gt;
+    &lt;Item&gt;
+      &lt;Product&gt;Laptop&lt;/Product&gt;
+      &lt;Quantity&gt;1&lt;/Quantity&gt;
+      &lt;Price&gt;999.99&lt;/Price&gt;
+    &lt;/Item&gt;
+    &lt;Item&gt;
+      &lt;Product&gt;Mouse&lt;/Product&gt;
+      &lt;Quantity&gt;2&lt;/Quantity&gt;
+      &lt;Price&gt;25.50&lt;/Price&gt;
+    &lt;/Item&gt;
+  &lt;/Items&gt;
+&lt;/Order&gt;
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> Policy Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🔄 Bidirectional transformations</li>
+                    <li style="padding: 5px 0;">📋 Field mapping and validation</li>
+                    <li style="padding: 5px 0;">🛡️ Error handling and fault tolerance</li>
+                    <li style="padding: 5px 0;">🔤 Special character handling</li>
+                    <li style="padding: 5px 0;">📊 Array and nested object support</li>
+                    <li style="padding: 5px 0;">🏷️ Namespace management</li>
+                    <li style="padding: 5px 0;">⚡ Performance optimization</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Policy Configuration</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Mapping Rules</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>Field name transformations</li>
+                        <li>Data type conversions</li>
+                        <li>Default value assignments</li>
+                        <li>Conditional mappings</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Validation</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>Required field checks</li>
+                        <li>Format validation</li>
+                        <li>Range validations</li>
+                        <li>Custom business rules</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Error Handling</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>Standardized error codes</li>
+                        <li>Error message templates</li>
+                        <li>Fallback mechanisms</li>
+                        <li>Logging and monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const code = `| Infor API Gateway Endpoint Policy: JSON to XML Transform
+| Policy Configuration with Handlebars Template Engine
+
+<?xml version="1.0" encoding="UTF-8"?>
+<jsonTransform continueOnError="false" 
+               displayName="Customer JSON to XML Transform"
+               enabled="true" 
+               name="Customer-JSON-to-XML" 
+               version="1.0"
+    xmlns="http://www.infor.com/ion/api"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.infor.com/ion/api jsonTransform.xsd">
+    
+    <!-- Optional matcher for conditional application -->
+    <matcher matchKind="string" 
+             matchValue="application/json" 
+             matchAction="apply"/>
+    
+    <transformations>
+        <transform kind="handlebars" outputType="text/xml">
+            <![CDATA[
+            <?xml version="1.0" encoding="UTF-8"?>
+            {{#if customer}}
+            <Customer>
+                {{#if customer.name}}
+                <Name>{{replace (replace (replace (replace (replace customer.name "&" "&amp;") "<" "&lt;") ">" "&gt;") "\"" "&quot;") "'" "&apos;"}}</Name>
+                {{else}}
+                <Name>UNKNOWN</Name>
+                {{/if}}
+                
+                {{#if customer.id}}
+                <ID>{{replace (replace (replace (replace (replace customer.id "&" "&amp;") "<" "&lt;") ">" "&gt;") "\"" "&quot;") "'" "&apos;"}}</ID>
+                {{else}}
+                <ID>NOT_PROVIDED</ID>
+                {{/if}}
+                
+                {{#if customer.email}}
+                <Email>{{replace (replace (replace (replace (replace customer.email "&" "&amp;") "<" "&lt;") ">" "&gt;") "\"" "&quot;") "'" "&apos;"}}</Email>
+                {{/if}}
+                
+                {{#if customer.address}}
+                <Address>
+                    <Street>{{replace (replace (replace (replace (replace customer.address.street "&" "&amp;") "<" "&lt;") ">" "&gt;") "\"" "&quot;") "'" "&apos;"}}</Street>
+                    <City>{{replace (replace (replace (replace (replace customer.address.city "&" "&amp;") "<" "&lt;") ">" "&gt;") "\"" "&quot;") "'" "&apos;"}}</City>
+                    <State>{{customer.address.state}}</State>
+                    <ZipCode>{{customer.address.zipCode}}</ZipCode>
+                </Address>
+                {{/if}}
+                
+                {{#if customer.orders}}
+                <Orders>
+                    {{#if customer.orders.length}}
+                        {{#each customer.orders}}
+                        <Order>
+                            <OrderID>{{orderId}}</OrderID>
+                            <OrderDate>{{orderDate}}</OrderDate>
+                            <Amount>{{amount}}</Amount>
+                            <Status>{{status}}</Status>
+                            {{#if items}}
+                            <Items>
+                                {{#each items}}
+                                <Item>
+                                    <ProductID>{{productId}}</ProductID>
+                                    <Quantity>{{quantity}}</Quantity>
+                                    <Price>{{price}}</Price>
+                                </Item>
+                                {{/each}}
+                            </Items>
+                            {{/if}}
+                        </Order>
+                        {{/each}}
+                    {{else}}
+                        <Order>
+                            <OrderID>{{customer.orders.orderId}}</OrderID>
+                            <OrderDate>{{customer.orders.orderDate}}</OrderDate>
+                            <Amount>{{customer.orders.amount}}</Amount>
+                            <Status>{{customer.orders.status}}</Status>
+                        </Order>
+                    {{/if}}
+                </Orders>
+                {{/if}}
+            </Customer>
+            {{else}}
+            <Error>
+                <Code>MISSING_CUSTOMER</Code>
+                <Message>Customer object is required</Message>
+                <Timestamp>{{date 'yyyy-MM-dd HH:mm:ss'}}</Timestamp>
+            </Error>
+            {{/if}}
+            ]]>
+        </transform>
+    </transformations>
+</jsonTransform>
+
+| Error Handling Policy for Failed Transformations
+<?xml version="1.0" encoding="UTF-8"?>
+<jsonTransform continueOnError="false" 
+               displayName="Error Response Handler"
+               enabled="true" 
+               name="Error-Response-Handler" 
+               version="1.0"
+    xmlns="http://www.infor.com/ion/api"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.infor.com/ion/api jsonTransform.xsd">
+    
+    <transformations>
+        <transform kind="handlebars" outputType="application/json">
+            <![CDATA[
+            {
+                "timestamp": "{{date 'yyyy-MM-dd HH:mm:ss'}}",
+                "status": "{{#if status}}{{status}}{{else}}Error{{/if}}",
+                "error": {
+                    "code": "{{#if errorCode}}{{errorCode}}{{else}}TRANSFORMATION_ERROR{{/if}}",
+                    "message": "{{#if errorMessage}}{{errorMessage}}{{else}}Transformation failed{{/if}}",
+                    "details": "{{errorDetails}}"
+                },
+                {{#if correlationId}}
+                "correlationId": "{{correlationId}}",
+                {{/if}}
+                "path": "{{requestPath}}"
+            }
+            ]]>
+        </transform>
+    </transformations>
+</jsonTransform>
+
+| JSON to JSON Transform with JSONPath
+<?xml version="1.0" encoding="UTF-8"?>
+<jsonTransform continueOnError="false" 
+               displayName="JSON Field Mapping"
+               enabled="true" 
+               name="JSON-Field-Mapping" 
+               version="1.0"
+    xmlns="http://www.infor.com/ion/api"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.infor.com/ion/api jsonTransform.xsd">
+    
+    <transformations>
+        <transform kind="handlebars" outputType="application/json">
+            <![CDATA[
+            {
+                "customerId": "{{jsonPath '$.customer.id'}}",
+                "customerName": "{{jsonPath '$.customer.name'}}",
+                "totalOrders": {{jsonPath '$.customer.orders.length'}},
+                "orderDetails": [
+                    {{#each (jsonPath '$.customer.orders')}}
+                    {
+                        "orderId": "{{orderId}}",
+                        "orderDate": "{{orderDate}}",
+                        "totalAmount": {{amount}},
+                        "itemCount": {{items.length}}
+                    }{{#if @last}}{{else}},{{/if}}
+                    {{/each}}
+                ],
+                "processedAt": "{{date 'yyyy-MM-dd HH:mm:ss'}}"
+            }
+            ]]>
+        </transform>
+    </transformations>
+</jsonTransform>
+
+| Policy Features:
+| - Handlebars template engine for dynamic transformations
+| - XML character escaping for special characters (&, <, >, ", ')
+| - Conditional field mapping with {{#if}} statements
+| - Array handling with {{#each}} loops
+| - JSONPath expressions for complex data extraction
+| - Error handling with fallback values
+| - Date formatting with {{date}} helper
+| - Namespace support for XML output
+| - CDATA sections to prevent XML parsing issues`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

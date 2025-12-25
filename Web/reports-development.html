@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports Development - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .report-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .report-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .report-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .report-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .code-sample {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .feature-item h5 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-chart-bar"></i> Reports Development</h1>
+            <p>Generate comprehensive 4GL reports with advanced formatting and data processing</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Give 4GL code for report development where I need a sales summary report showing customer-wise sales totals, order counts, and average order values for a date range. Include grouping by customer and grand totals.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Reports Development - Sales Summary Report</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">Report Types</h2>
+            <div class="report-types">
+                <div class="report-item">
+                    <i class="fas fa-table"></i>
+                    <h4>Tabular Reports</h4>
+                    <p>Structured data in rows and columns with headers</p>
+                </div>
+                <div class="report-item">
+                    <i class="fas fa-chart-line"></i>
+                    <h4>Summary Reports</h4>
+                    <p>Aggregated data with totals and subtotals</p>
+                </div>
+                <div class="report-item">
+                    <i class="fas fa-file-excel"></i>
+                    <h4>Excel Reports</h4>
+                    <p>Excel format with colors, formatting, and charts</p>
+                </div>
+                <div class="report-item">
+                    <i class="fas fa-print"></i>
+                    <h4>Formatted Reports</h4>
+                    <p>Professional layouts with headers, footers, and styling</p>
+                </div>
+                <div class="report-item">
+                    <i class="fas fa-filter"></i>
+                    <h4>Filtered Reports</h4>
+                    <p>Dynamic filtering and parameter-based reports</p>
+                </div>
+                <div class="report-item">
+                    <i class="fas fa-layer-group"></i>
+                    <h4>Multi-level Reports</h4>
+                    <p>Hierarchical data with grouping and drill-down</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Sales Summary Report</h4>
+                <div class="prompt-text">
+                    "Give 4GL code for report development where I need a sales summary report showing customer-wise sales totals, order counts, and average order values for a date range. Include grouping by customer and grand totals."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Report.md, Reports_functions.md, 4gl-core-syntax.md, 4gl-error-handling-rules.md, 4gl-advanced-patterns.md, 4GL_Table_Operations_Guide.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Inventory Status Report</h4>
+                <div class="prompt-text">
+                    "Create 4GL report code for inventory status showing item codes, descriptions, current stock, reorder levels, and stock value. Include filtering by warehouse and item category with Excel output format."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Report.md, Reports_functions.md, Excel_Color_Report_Generation_UseCase.md, 4gl-advanced-patterns.md, 4GL_Table_Operations_Guide.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Financial Analysis Report</h4>
+                <div class="prompt-text">
+                    "Generate 4GL report for financial analysis with accounts payable aging, showing vendor-wise outstanding amounts by age buckets (0-30, 31-60, 61-90, 90+ days). Include percentage calculations and charts."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Report.md, Reports_functions.md, Excel_HTML_Reports_UseCase.md, 4gl-validation.md, 4gl-advanced-patterns.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Report Structure</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: #667eea; margin-bottom: 15px;">Standard Report Sections:</h4>
+                <div class="code-sample">
+main_section.1:
+before.layout:
+    | Report initialization
+    | Parameter validation
+    | Header setup
+
+main_section.2:
+    | Data processing
+    | Query execution
+    | Calculations
+
+after.layout:
+    | Totals and summaries
+    | Footer information
+    | Cleanup
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Predefined Variables</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h5>lattr.print</h5>
+                    <p>Print control flag</p>
+                </div>
+                <div class="feature-item">
+                    <h5>lattr.pageno</h5>
+                    <p>Current page number</p>
+                </div>
+                <div class="feature-item">
+                    <h5>lattr.enddata</h5>
+                    <p>End of data indicator</p>
+                </div>
+                <div class="feature-item">
+                    <h5>lattr.break</h5>
+                    <p>Break level indicator</p>
+                </div>
+                <div class="feature-item">
+                    <h5>lattr.lineno</h5>
+                    <p>Current line number</p>
+                </div>
+                <div class="feature-item">
+                    <h5>lattr.newpage</h5>
+                    <p>New page trigger</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> Report Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">📊 Multi-table data aggregation</li>
+                    <li style="padding: 5px 0;">🎨 Professional formatting and styling</li>
+                    <li style="padding: 5px 0;">📈 Charts and graphical elements</li>
+                    <li style="padding: 5px 0;">🔢 Automatic calculations and totals</li>
+                    <li style="padding: 5px 0;">📄 Multiple output formats (PDF, Excel, HTML)</li>
+                    <li style="padding: 5px 0;">🔍 Dynamic filtering and parameters</li>
+                    <li style="padding: 5px 0;">⚡ Performance optimized queries</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Report Functions</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Layout Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>print.data()</li>
+                        <li>skip.line()</li>
+                        <li>new.page()</li>
+                        <li>set.margins()</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Data Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>sum.field()</li>
+                        <li>count.records()</li>
+                        <li>avg.value()</li>
+                        <li>group.by()</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Format Functions</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>format.number()</li>
+                        <li>format.date()</li>
+                        <li>format.currency()</li>
+                        <li>format.percentage()</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Excel Report Features</h2>
+            <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: #28a745; margin-bottom: 15px;">Excel-Specific Capabilities:</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🎨 <strong>Cell Formatting:</strong> Colors, fonts, borders, alignment</li>
+                    <li style="padding: 5px 0;">📊 <strong>Charts:</strong> Bar, line, pie charts with data series</li>
+                    <li style="padding: 5px 0;">🔢 <strong>Formulas:</strong> Excel formulas for calculations</li>
+                    <li style="padding: 5px 0;">📋 <strong>Multiple Sheets:</strong> Workbook with multiple worksheets</li>
+                    <li style="padding: 5px 0;">🔒 <strong>Protection:</strong> Cell and sheet protection</li>
+                    <li style="padding: 5px 0;">📐 <strong>Layout:</strong> Column widths, row heights, merged cells</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Performance Optimization</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #856404;">Query Optimization</h5>
+                    <p style="font-size: 0.9rem;">Efficient SQL with proper indexes</p>
+                </div>
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #856404;">Memory Management</h5>
+                    <p style="font-size: 0.9rem;">Optimized memory usage for large datasets</p>
+                </div>
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #856404;">Batch Processing</h5>
+                    <p style="font-size: 0.9rem;">Process data in chunks for better performance</p>
+                </div>
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #856404;">Caching</h5>
+                    <p style="font-size: 0.9rem;">Cache frequently used data and calculations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Report Development Process</h2>
+            <ol style="padding-left: 20px;">
+                <li style="margin: 10px 0;"><strong>Requirements Analysis:</strong> Define report purpose, audience, and data sources</li>
+                <li style="margin: 10px 0;"><strong>Data Design:</strong> Identify tables, joins, and calculations needed</li>
+                <li style="margin: 10px 0;"><strong>Layout Design:</strong> Plan report structure, grouping, and formatting</li>
+                <li style="margin: 10px 0;"><strong>Code Generation:</strong> Amazon Q generates optimized 4GL code</li>
+                <li style="margin: 10px 0;"><strong>Testing:</strong> Validate data accuracy and performance</li>
+                <li style="margin: 10px 0;"><strong>Deployment:</strong> Deploy to production environment</li>
+            </ol>
+        </div>
+    </div>
+    <script>
+        const code = `| Sales Summary Report - Customer-wise Analysis
+| Using correct Infor Reports functions from Report.md and Reports_functions.md
+
+declaration:
+	#include <bic_dam>
+	
+	|Tables
+	table ttdsls400
+	table ttccom100
+	
+	|Global Variables
+	long g.report
+	
+	|Form Variables (input parameters)
+	extern domain tcdate f.from.date.f
+	extern domain tcdate f.from.date.t
+	extern domain tcdate f.to.date.f
+	extern domain tcdate f.to.date.t
+	
+	|Report Variables (output to report)
+	extern domain tcbpid r.customer.code
+	extern domain tcnama r.customer.name
+	extern domain tcamnt r.sales.total
+	extern long r.order.count
+	extern domain tcamnt r.average.order
+	extern domain tcamnt r.grand.total
+	extern long r.total.orders
+	extern domain tcmcs.str132m r.error
+
+function extern long process.sales.summary.report()
+{
+	|Variable Declaration
+	domain tcdate l.from.date
+	domain tcdate l.to.date
+	double l.customer.total
+	long l.customer.orders
+	long l.ret
+	
+	|Variable Initialization
+	tt.init.vars(
+		l.from.date,
+		l.to.date,
+		l.customer.total,
+		l.customer.orders,
+		l.ret
+	)
+	
+	l.from.date = f.from.date.f
+	l.to.date = f.to.date.t
+	
+	|Open Report using correct function
+	g.report = brp.open("txsls.sales.summary", "", 1)
+	if g.report <= 0 then
+		dal.set.error.message("txsls.0001")
+		|Cannot open report
+		show.dal.messages()
+		return(DALHOOKERROR)
+	endif
+	
+	|Initialize grand totals
+	r.grand.total = 0.0
+	r.total.orders = 0
+	
+	|Main Processing Logic - Customer summary query
+	select tdsls400.ofbp:r.customer.code,
+	       tccom100.nama:r.customer.name,
+	       sum(tdsls400.amnt):l.customer.total,
+	       count(*):l.customer.orders
+	from   tdsls400, tccom100
+	where  tdsls400.odat >= :l.from.date
+	and    tdsls400.odat <= :l.to.date
+	and    tdsls400.hdst = tdsls.hdst.approved
+	and    tccom100._index1 = {:tdsls400.ofbp}
+	group by tdsls400.ofbp, tccom100.nama
+	order by tdsls400.ofbp
+	selectdo
+		|Process each customer record
+		db.retry.point()
+		
+		|Assign values to report variables
+		r.sales.total = l.customer.total
+		r.order.count = l.customer.orders
+		
+		|Calculate average order value
+		if l.customer.orders > 0 then
+			r.average.order = l.customer.total / l.customer.orders
+		else
+			r.average.order = 0.0
+		endif
+		
+		|Accumulate grand totals
+		r.grand.total = r.grand.total + l.customer.total
+		r.total.orders = r.total.orders + l.customer.orders
+		
+		|Send data to report using correct function
+		brp.ready(g.report)
+		
+		commit.transaction()
+	endselect
+	
+	|Close Report using correct function
+	brp.close(g.report)
+	
+	return(0)
+}
+
+|Report Script Sections (main_section.<layout_number>:)
+before.report.1:
+before.layout:
+	|Report header setup using predefined variables
+	lattr.print = tcyesno.yes
+	|Print report title and parameters
+
+header.1:
+before.layout:
+	|Page header with column titles
+	lattr.print = tcyesno.yes
+
+detail.1:
+before.layout:
+	|Detail line formatting
+	if not lattr.enddata then
+		lattr.print = tcyesno.yes
+	else
+		lattr.print = tcyesno.no
+	endif
+
+footer.1:
+before.layout:
+	|Page footer with page number
+	lattr.print = tcyesno.yes
+
+after.report.1:
+before.layout:
+	|Grand totals and summary
+	lattr.print = tcyesno.yes
+
+function extern long generate.excel.sales.report(
+	domain	tcdate		i.from.date,
+	domain	tcdate		i.to.date,
+	ref	string		o.excel.file(256)mb,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.file.pointer
+	string	l.csv.line(1000)
+	string	l.temp.file(256)
+	domain	tcbpid	l.customer.code
+	domain	tcnama	l.customer.name
+	double	l.sales.total
+	long	l.order.count
+	double	l.average.order
+	
+	tt.init.vars(
+		l.ret,
+		l.file.pointer,
+		l.csv.line,
+		l.temp.file,
+		l.customer.code,
+		l.customer.name,
+		l.sales.total,
+		l.order.count,
+		l.average.order,
+		o.excel.file,
+		o.error
+	)
+	
+	|Create temporary CSV file for Excel import
+	l.temp.file = bse.tmp.dir$() + "sales_summary_" + str$(utc.num()) + ".csv"
+	
+	l.file.pointer = seq.open(l.temp.file, "w")
+	if l.file.pointer <= 0 then
+		o.error = "Cannot create temporary file for Excel export"
+		return(-12)
+	endif
+	
+	|Write CSV header
+	l.csv.line = "Customer Code,Customer Name,Total Sales,Order Count,Average Order"
+	seq.puts(l.csv.line, l.file.pointer)
+	
+	|Write data rows
+	select tdsls400.ofbp,
+	       tccom100.nama,
+	       sum(tdsls400.amnt),
+	       count(*)
+	from   tdsls400, tccom100
+	where  tdsls400.odat >= :i.from.date
+	and    tdsls400.odat <= :i.to.date
+	and    tdsls400.hdst = tdsls.hdst.approved
+	and    tccom100._index1 = {:tdsls400.ofbp}
+	group by tdsls400.ofbp, tccom100.nama
+	order by sum(tdsls400.amnt) desc
+	selectdo
+		l.customer.code = tdsls400.ofbp
+		l.customer.name = tccom100.nama
+		l.sales.total = sum(tdsls400.amnt)
+		l.order.count = count(*)
+		
+		if l.order.count > 0 then
+			l.average.order = l.sales.total / l.order.count
+		else
+			l.average.order = 0.0
+		endif
+		
+		|Build CSV line with proper escaping
+		l.csv.line = l.customer.code + "," +
+		             "\"" + l.customer.name + "\"," +
+		             str$(l.sales.total, "###,###,##0.00") + "," +
+		             str$(l.order.count) + "," +
+		             str$(l.average.order, "###,###,##0.00")
+		
+		seq.puts(l.csv.line, l.file.pointer)
+	endselect
+	
+	|Close file
+	seq.close(l.file.pointer)
+	
+	|Set output file path
+	o.excel.file = l.temp.file
+	
+	return(0)
+}
+
+|Report Function Reference (from Reports_functions.md):
+|brp.open() - Activate report and open spooler device
+|brp.ready() - Signal that record is ready for import
+|brp.close() - Stop report writer and send to printer
+|rprt_open() - Short version of brp.open()
+|rprt_send() - Short version of brp.ready()
+|rprt_close() - Short version of brp.close()
+
+|Predefined Variables (from Report.md):
+|lattr.print - Controls whether layout is printed
+|lattr.pageno - Current page number
+|lattr.enddata - End of data indicator
+|lattr.break - Break level indicator
+|lattr.lineno - Current line number`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

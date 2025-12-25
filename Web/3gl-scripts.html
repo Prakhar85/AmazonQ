@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3GL Scripts - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .script-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .feature-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .code-sample {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-terminal"></i> 3GL Scripts</h1>
+            <p>Generate 3GL scripts for process management and system automation</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Give 3GL script for batch processing of sales orders. Include process startup, wait for completion, error handling, and notification upon finish. Load necessary files from master rules.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">3GL Scripts - Batch Processing</div>
+                </div>
+                <div class="ide-content">
+                    <pre><code id="code-output" class="language-c code-editor"></code></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">3GL Script Features</h2>
+            <div class="script-features">
+                <div class="feature-item">
+                    <i class="fas fa-play"></i>
+                    <h4>Process Control</h4>
+                    <p>Start, stop, and manage LN processes</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-clock"></i>
+                    <h4>Wait & Activate</h4>
+                    <p>Synchronization and timing control</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-layer-group"></i>
+                    <h4>Process Groups</h4>
+                    <p>Manage related processes as groups</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-cogs"></i>
+                    <h4>System Integration</h4>
+                    <p>Interface with external systems</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Batch Processing Script</h4>
+                <div class="prompt-text">
+                    "Give 3GL script for batch processing of sales orders. Include process startup, wait for completion, error handling, and notification upon finish. Load necessary files from master rules."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 3GL_Compact_Template.md, Process groups.md, Starting and stopping programs.md, 4gl-advanced-patterns.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Scheduled Data Synchronization</h4>
+                <div class="prompt-text">
+                    "Create 3GL script for scheduled data synchronization between LN and external system. Include timing control, retry logic, and status monitoring."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 3GL_Compact_Template.md, Process groups.md, Starting and stopping programs.md, 4gl-advanced-patterns.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: System Maintenance Script</h4>
+                <div class="prompt-text">
+                    "Generate 3GL script for system maintenance tasks including database cleanup, log archival, and performance monitoring. Include wait.and.activate patterns for sequential execution."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 3GL_Compact_Template.md, Process groups.md, Starting and stopping programs.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> 3GL Script Capabilities</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🚀 Process lifecycle management</li>
+                    <li style="padding: 5px 0;">⏱️ Timing and synchronization control</li>
+                    <li style="padding: 5px 0;">🔄 Retry and error recovery mechanisms</li>
+                    <li style="padding: 5px 0;">📊 Status monitoring and reporting</li>
+                    <li style="padding: 5px 0;">🔗 System integration patterns</li>
+                    <li style="padding: 5px 0;">📋 Batch processing workflows</li>
+                    <li style="padding: 5px 0;">⚡ Performance optimization</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Sample 3GL Script Structure</h2>
+            <div class="code-sample">
+| 3GL Script Example - Batch Processing
+program.name = "batch.sales.processing"
+
+| Start main processing
+start.program("txsls.batch.process")
+
+| Wait for completion with timeout
+wait.and.activate(
+    program = "txsls.batch.process",
+    timeout = 3600,
+    on.completion = "process.completed",
+    on.error = "process.error"
+)
+
+process.completed:
+    | Send success notification
+    send.notification("Batch processing completed successfully")
+    goto end.script
+
+process.error:
+    | Handle error condition
+    log.error("Batch processing failed")
+    send.alert("Batch processing error - manual intervention required")
+    goto end.script
+
+end.script:
+    | Cleanup and exit
+    cleanup.resources()
+    exit.program()
+            </div>
+        </div>
+    </div>
+    <script>
+        const code = `|******************************************************************************
+|* txsls.batch.processing.bc  Version 1.0
+|* Sales Order Batch Processing Script
+|* Author: Amazon Q | Date: 2024
+|******************************************************************************
+|* Script Type: 0 - Batch Processing
+|******************************************************************************
+
+#include <bic_dam>
+#include <bic_text>
+#pragma used dll "libutil"
+
+table ttdsls400
+table ttccom100
+
+|* Global variables
+string g.process.status(20) based
+string g.error.log(256) based
+string g.notification.email(100) based
+long g.processed.count based
+long g.error.count based
+long g.start.time based
+
+function main()
+{
+    functionusage
+        Desc:   Batch processing of sales orders with error handling
+        Input:  argv$(1) - email for notifications
+                argv$(2) - process timeout in seconds
+        Return: 0 = success, 1 = error
+    endfunctionusage
+    
+    |* Variable declarations
+    long l.ret
+    long l.timeout
+    long l.child.pid
+    string l.command(500)
+    string l.log.message(512)
+    
+    |* Initialize variables
+    g.process.status = "INITIALIZING"
+    g.processed.count = 0
+    g.error.count = 0
+    g.start.time = utc.num()
+    
+    |* Read command line arguments
+    g.notification.email = argv$(1)
+    l.timeout = lval(argv$(2))
+    
+    |* Set defaults if not provided
+    if isspace(g.notification.email) then
+        g.notification.email = "admin@company.com"
+    endif
+    
+    if l.timeout <= 0 then
+        l.timeout = 3600  |* Default 1 hour
+    endif
+    
+    |* Create error log file
+    g.error.log = bse.tmp.dir$() & "batch_errors_" & string(g.start.time) & ".log"
+    
+    |* Log batch start
+    l.log.message = "Batch processing started at: " & string(g.start.time)
+    write.to.log(l.log.message)
+    
+    |* Start main processing program
+    l.command = "txsls.process.orders"
+    l.child.pid = activate(l.command)
+    
+    if l.child.pid <= 0 then
+        g.process.status = "FAILED"
+        l.log.message = "ERROR: Failed to start sales order processing program"
+        write.to.log(l.log.message)
+        send.error.notification("Failed to start batch processing")
+        end(1)
+    endif
+    
+    g.process.status = "PROCESSING"
+    l.log.message = "Sales order processing program started successfully (PID: " & string(l.child.pid) & ")"
+    write.to.log(l.log.message)
+    
+    |* Wait for completion with timeout
+    l.ret = wait.and.activate(l.child.pid, l.timeout)
+    
+    on case l.ret
+    case 0:
+        |* Process completed successfully
+        g.process.status = "COMPLETED"
+        l.log.message = "Batch processing completed successfully"
+        write.to.log(l.log.message)
+        
+        |* Get processing statistics
+        get.processing.statistics()
+        
+        |* Start post-processing
+        start.post.processing()
+        
+        |* Send success notification
+        send.success.notification()
+        break
+        
+    case 1:
+        |* Process failed
+        g.process.status = "ERROR"
+        l.log.message = "ERROR: Batch processing failed"
+        write.to.log(l.log.message)
+        send.error.notification("Batch processing failed")
+        break
+        
+    case 2:
+        |* Process timed out
+        g.process.status = "TIMEOUT"
+        l.log.message = "ERROR: Batch processing timed out after " & string(l.timeout) & " seconds"
+        write.to.log(l.log.message)
+        
+        |* Try to terminate the process
+        terminate.process(l.child.pid)
+        
+        send.error.notification("Batch processing timed out")
+        break
+        
+    default:
+        |* Unknown error
+        g.process.status = "UNKNOWN_ERROR"
+        l.log.message = "ERROR: Unknown error occurred (return code: " & string(l.ret) & ")"
+        write.to.log(l.log.message)
+        send.error.notification("Unknown error in batch processing")
+    endcase
+    
+    |* Cleanup and exit
+    cleanup.resources()
+    
+    |* Final log entry
+    l.log.message = "Batch processing script completed at: " & string(utc.num())
+    write.to.log(l.log.message)
+    l.log.message = "Final status: " & g.process.status
+    write.to.log(l.log.message)
+    
+    if g.process.status = "COMPLETED" then
+        end(0)
+    else
+        end(1)
+    endif
+}
+
+function write.to.log(string i.message(512))
+{
+    |* Write timestamped message to log file
+    long l.fp
+    string l.timestamp(20)
+    string l.full.message(600)
+    
+    l.timestamp = string(utc.num())
+    l.full.message = l.timestamp & ": " & i.message
+    
+    l.fp = seq.open(g.error.log, "a")
+    if l.fp > 0 then
+        seq.puts(l.full.message, l.fp)
+        seq.close(l.fp)
+    endif
+}
+
+function get.processing.statistics()
+{
+    |* Get processing statistics from completed process
+    |* This would typically read from a status file or database
+    
+    string l.status.file(256)
+    long l.fp
+    string l.line(100)
+    
+    l.status.file = bse.tmp.dir$() & "process_status.txt"
+    
+    l.fp = seq.open(l.status.file, "r")
+    if l.fp > 0 then
+        |* Read processed count
+        if seq.gets(l.line, l.fp) > 0 then
+            g.processed.count = lval(l.line)
+        endif
+        
+        |* Read error count
+        if seq.gets(l.line, l.fp) > 0 then
+            g.error.count = lval(l.line)
+        endif
+        
+        seq.close(l.fp)
+    endif
+    
+    write.to.log("Orders processed: " & string(g.processed.count))
+    write.to.log("Errors encountered: " & string(g.error.count))
+}
+
+function start.post.processing()
+{
+    |* Start post-processing tasks
+    long l.child.pid
+    long l.ret
+    string l.command(200)
+    
+    l.command = "txsls.post.process"
+    l.child.pid = activate(l.command)
+    
+    if l.child.pid > 0 then
+        write.to.log("Post-processing started (PID: " & string(l.child.pid) & ")")
+        
+        |* Wait for post-processing (10 minutes timeout)
+        l.ret = wait.and.activate(l.child.pid, 600)
+        
+        if l.ret = 0 then
+            write.to.log("Post-processing completed successfully")
+        else
+            write.to.log("WARNING: Post-processing failed or timed out")
+        endif
+    else
+        write.to.log("WARNING: Failed to start post-processing")
+    endif
+}
+
+function send.success.notification()
+{
+    |* Send success notification email
+    long l.child.pid
+    string l.command(1000)
+    string l.subject(100)
+    string l.message(500)
+    long l.duration
+    
+    l.duration = utc.num() - g.start.time
+    
+    l.subject = "Batch Processing Completed Successfully"
+    l.message = "Sales order batch processing completed.\n" &
+               "Orders processed: " & string(g.processed.count) & "\n" &
+               "Errors: " & string(g.error.count) & "\n" &
+               "Duration: " & string(l.duration) & " seconds"
+    
+    l.command = "email.sender \"" & g.notification.email & "\" \"" & l.subject & "\" \"" & l.message & "\""
+    
+    l.child.pid = activate(l.command)
+    if l.child.pid > 0 then
+        write.to.log("Success notification sent to: " & g.notification.email)
+    else
+        write.to.log("WARNING: Failed to send success notification")
+    endif
+}
+
+function send.error.notification(string i.error.type(100))
+{
+    |* Send error notification email
+    long l.child.pid
+    string l.command(1000)
+    string l.subject(100)
+    string l.message(500)
+    
+    l.subject = "Batch Processing Failed"
+    l.message = "Sales order batch processing failed.\n" &
+               "Error type: " & i.error.type & "\n" &
+               "Status: " & g.process.status & "\n" &
+               "Error log: " & g.error.log & "\n" &
+               "Manual intervention required."
+    
+    l.command = "email.sender \"" & g.notification.email & "\" \"" & l.subject & "\" \"" & l.message & "\""
+    
+    l.child.pid = activate(l.command)
+    if l.child.pid > 0 then
+        write.to.log("Error notification sent to: " & g.notification.email)
+    else
+        write.to.log("CRITICAL: Failed to send error notification")
+    endif
+}
+
+function terminate.process(long i.pid)
+{
+    |* Attempt to terminate a running process
+    long l.ret
+    
+    if i.pid > 0 then
+        l.ret = kill.process(i.pid)
+        if l.ret = 0 then
+            write.to.log("Process " & string(i.pid) & " terminated successfully")
+        else
+            write.to.log("WARNING: Failed to terminate process " & string(i.pid))
+        endif
+    endif
+}
+
+function cleanup.resources()
+{
+    |* Cleanup any allocated resources
+    
+    |* Free global memory if allocated
+    if allocated(g.process.status) then
+        free.mem(g.process.status)
+    endif
+    
+    if allocated(g.error.log) then
+        free.mem(g.error.log)
+    endif
+    
+    if allocated(g.notification.email) then
+        free.mem(g.notification.email)
+    endif
+    
+    write.to.log("Resources cleaned up successfully")
+}
+
+|* End of 3GL Script`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                    if (currentIndex % 100 === 0) Prism.highlightElement(output);
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                    Prism.highlightElement(output);
+                }
+            }, 1);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAL Development - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 40px; padding: 40px 0; }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: white; text-decoration: none; margin-bottom: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 25px; transition: background 0.3s ease; }
+        .back-link:hover { background: rgba(255,255,255,0.3); }
+        .content-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .section-title { font-size: 1.8rem; color: #667eea; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .example-prompt { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 15px 0; border-radius: 5px; }
+        .example-prompt h4 { color: #667eea; margin-bottom: 10px; }
+        .prompt-text { font-style: italic; color: #555; margin-bottom: 10px; }
+        .files-loaded { background: #e8f5e8; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
+        .files-loaded strong { color: #28a745; }
+        .capability-list { list-style: none; padding: 0; }
+        .capability-list li { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .capability-list li:before { content: "⚡ "; color: #667eea; font-weight: bold; }
+        .highlight-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-layer-group"></i> DAL Development</h1>
+            <p>Data Access Layer development with object hooks, field validation, and business methods</p>
+        </header>
+
+        <div class="content-card">
+            <h2 class="section-title">DAL Development Capabilities</h2>
+            <ul class="capability-list">
+                <li>Object-level hooks (before.get, after.save, etc.)</li>
+                <li>Field-level property hooks (is.valid, is.mandatory, etc.)</li>
+                <li>Field dependencies with dal.field.depends.on()</li>
+                <li>Business methods with validation logic</li>
+                <li>Custom validation rules and error handling</li>
+                <li>Table relationship management</li>
+                <li>Data integrity enforcement</li>
+                <li>Performance optimized operations</li>
+            </ul>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Customer DAL with Validation</h4>
+                <div class="prompt-text">
+                    "Create DAL for customer table with object hooks for validation, field dependencies for address fields, and business methods for credit limit checking."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> DAL_Complete_Guide.md, DAL_Objecthooks_Examples.md, DAL_Fieldhooks_Examples.md, DAL_Fielddependencies_Examples.md, 4gl-validation.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Purchase Order DAL</h4>
+                <div class="prompt-text">
+                    "Generate DAL for purchase order with line validation, automatic totals calculation, approval workflow integration, and proper error handling."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> DAL_Complete_Guide.md, DAL_Businessmethods_Examples.md, 4GL_Table_Operations_Guide.md, enum-domain-assignment-rules.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Item Master DAL</h4>
+                <div class="prompt-text">
+                    "Create comprehensive DAL for item master with field validation, unit conversion logic, inventory tracking hooks, and multi-site support."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> DAL_Complete_Guide.md, DAL_Fieldhooks_Examples.md, DAL_Fielddependencies_Examples.md, mandatory-field-validation.md, 4gl-validation.md
+                </div>
+            </div>
+        </div>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Create DAL for customer table with object hooks for validation, field dependencies for address fields, and business methods for credit limit checking.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">DAL Development - Customer Table</div>
+                </div>
+                <div class="ide-content">
+                    <pre><code id="code-output" class="language-c code-editor"></code></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-magic"></i> DAL Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">✓ Complete object lifecycle management</li>
+                    <li style="padding: 5px 0;">✓ Field-level validation and dependencies</li>
+                    <li style="padding: 5px 0;">✓ Business logic integration</li>
+                    <li style="padding: 5px 0;">✓ Error handling and messaging</li>
+                    <li style="padding: 5px 0;">✓ Performance optimization</li>
+                    <li style="padding: 5px 0;">✓ Data integrity enforcement</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = `|******************************************************************************
+|* DAL for Customer Table (tccom100) - Complete Implementation
+|* Using proper DAL2 patterns from DAL_Complete_Guide.md
+|******************************************************************************
+
+#include <bic_dal2>
+
+|=== OBJECT HOOKS ===
+
+|Set default values for new customer
+function extern long set.object.defaults()
+{
+    tccom100.stat = tccom.stat.active
+    tccom100.cdat = utc.num()
+    tccom100.crtm = tccom.crtm.net30
+    tccom100.ccur = tccom.ccur.usd
+    
+    return(0)
+}
+
+|Before creating new customer object
+function extern long before.new.object()
+{
+    |Initialize audit fields
+    tccom100.logn = logname$()
+    tccom100.cdat = utc.num()
+    
+    return(0)
+}
+
+|Before saving customer object
+function extern long before.save.object(long mode)
+{
+    |Validate mandatory fields
+    if isspace(tccom100.bpid) then
+        dal.set.error.message("Customer code is required")
+        return(DALHOOKERROR)
+    endif
+    
+    if isspace(tccom100.nama) then
+        dal.set.error.message("Customer name is required")
+        return(DALHOOKERROR)
+    endif
+    
+    |Check for duplicate customer code on new records
+    if mode = DAL_NEW then
+        select tccom100.bpid
+        from   tccom100
+        where  tccom100.bpid = {:tccom100.bpid}
+        selectdo
+            dal.set.error.message("Customer code already exists: " & tccom100.bpid)
+            return(DALHOOKERROR)
+        endselect
+    endif
+    
+    |Update modification timestamp
+    tccom100.ldat = utc.num()
+    tccom100.llogn = logname$()
+    
+    return(0)
+}
+
+|Before deleting customer
+function extern long before.destroy.object()
+{
+    |Check if customer has open orders
+    select tdsls400.orno
+    from   tdsls400
+    where  tdsls400.ofbp = {:tccom100.bpid}
+    and    tdsls400.hdst in (tdsls.hdst.free, tdsls.hdst.approved)
+    selectdo
+        dal.set.error.message("Cannot delete customer with open orders")
+        return(DALHOOKERROR)
+    endselect
+    
+    |Check outstanding balance
+    if tccom100.obal <> 0 then
+        dal.set.error.message("Cannot delete customer with outstanding balance")
+        return(DALHOOKERROR)
+    endif
+    
+    return(0)
+}
+
+|=== FIELD HOOKS ===
+
+|Customer type field validation
+function extern boolean tccom100.bpty.is.valid()
+{
+    on case tccom100.bpty
+    case tccom.bpty.customer:
+    case tccom.bpty.supplier:
+    case tccom.bpty.both:
+        return(true)
+    default:
+        dal.set.error.message("Invalid customer type selected")
+        return(false)
+    endcase
+}
+
+|Credit limit field validation
+function extern boolean tccom100.crlm.is.valid()
+{
+    |Credit limit must be positive
+    if tccom100.crlm < 0 then
+        dal.set.error.message("Credit limit cannot be negative")
+        return(false)
+    endif
+    
+    return(true)
+}
+
+|Customer status field validation
+function extern boolean tccom100.stat.is.valid()
+{
+    on case tccom100.stat
+    case tccom.stat.active:
+    case tccom.stat.inactive:
+    case tccom.stat.blocked:
+        return(true)
+    default:
+        dal.set.error.message("Invalid customer status")
+        return(false)
+    endcase
+}
+
+|Payment terms validation
+function extern boolean tccom100.crtm.is.valid()
+{
+    |Check if payment terms exist in reference table
+    select tcmcs100.crtm
+    from   tcmcs100
+    where  tcmcs100.crtm = {:tccom100.crtm}
+    selectdo
+        |Check if payment terms are active
+        if tcmcs100.stat <> tcmcs.stat.active then
+            dal.set.error.message("Payment terms are not active")
+            return(false)
+        endif
+    selectempty
+        dal.set.error.message("Payment terms not found")
+        return(false)
+    endselect
+    
+    return(true)
+}
+
+|Country code validation
+function extern boolean tccom100.ccty.is.valid()
+{
+    |Validate country code exists
+    select tcmcs013.ccty
+    from   tcmcs013
+    where  tcmcs013.ccty = {:tccom100.ccty}
+    selectdo
+        return(true)
+    selectempty
+        dal.set.error.message("Invalid country code")
+        return(false)
+    endselect
+}
+
+|State field applicability based on country
+function extern boolean tccom100.stat.is.applicable()
+{
+    |State field only applicable for certain countries
+    on case tccom100.ccty
+    case "US":
+    case "CA":
+    case "AU":
+        return(true)
+    default:
+        return(false)
+    endcase
+}
+
+|Postal code format validation
+function extern boolean tccom100.pstc.is.valid()
+{
+    |Validate postal code format based on country
+    on case tccom100.ccty
+    case "US":
+        |US ZIP code format (5 digits or 5+4)
+        if not match.pattern(tccom100.pstc, "^[0-9]{5}(-[0-9]{4})?$") then
+            dal.set.error.message("Invalid US ZIP code format")
+            return(false)
+        endif
+        break
+    case "CA":
+        |Canadian postal code format
+        if not match.pattern(tccom100.pstc, "^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$") then
+            dal.set.error.message("Invalid Canadian postal code format")
+            return(false)
+        endif
+        break
+    default:
+        |Basic validation for other countries
+        if len(tccom100.pstc) > 10 then
+            dal.set.error.message("Postal code too long")
+            return(false)
+        endif
+    endcase
+    
+    return(true)
+}
+
+|=== FIELD DEPENDENCIES ===
+
+function extern long before.open.object.set()
+{
+    |Setup field dependencies
+    define.field.dependencies()
+    return(0)
+}
+
+function define.field.dependencies()
+{
+    |Country affects state field visibility
+    dal.field.depends.on(
+        "tccom100.stat",
+        HOOK_IS_APPLICABLE,
+        "tccom100.ccty"
+    )
+    
+    |Country affects postal code validation
+    dal.field.depends.on(
+        "tccom100.pstc",
+        HOOK_IS_VALID,
+        "tccom100.ccty"
+    )
+    
+    |Customer type affects certain fields
+    dal.field.depends.on(
+        "tccom100.crlm",
+        HOOK_IS_APPLICABLE,
+        "tccom100.bpty"
+    )
+}
+
+|=== BUSINESS METHODS ===
+
+|Check if customer can place orders
+function long tccom100.can.place.orders()
+{
+    domain tcamnt01 l.current.balance
+    long l.ret
+    
+    |Check if customer is active
+    if tccom100.stat <> tccom.stat.active then
+        dal.set.error.message("Customer is not active")
+        return(-12)
+    endif
+    
+    |Get current balance
+    l.ret = get.customer.balance(tccom100.bpid, l.current.balance)
+    if l.ret <> 0 then
+        dal.set.error.message("Unable to retrieve customer balance")
+        return(-12)
+    endif
+    
+    |Check credit limit
+    if l.current.balance > tccom100.crlm then
+        dal.set.error.message("Customer has exceeded credit limit")
+        return(-12)
+    endif
+    
+    return(0)
+}
+
+|Helper method to check if orders are allowed
+function boolean tccom100.can.place.orders.is.allowed()
+{
+    long l.ret
+    
+    l.ret = tccom100.can.place.orders()
+    return(l.ret = 0)
+}
+
+|Calculate customer credit available
+function long tccom100.get.credit.available(
+    ref domain tcamnt01 o.available.credit
+)
+{
+    domain tcamnt01 l.current.balance
+    long l.ret
+    
+    |Initialize output
+    o.available.credit = 0
+    
+    |Get current balance
+    l.ret = get.customer.balance(tccom100.bpid, l.current.balance)
+    if l.ret <> 0 then
+        return(-12)
+    endif
+    
+    |Calculate available credit
+    o.available.credit = tccom100.crlm - l.current.balance
+    if o.available.credit < 0 then
+        o.available.credit = 0
+    endif
+    
+    return(0)
+}
+
+|Helper function to get customer balance
+function long get.customer.balance(
+    domain tccom.bpid i.customer.code,
+    ref domain tcamnt01 o.balance
+)
+{
+    |Initialize balance
+    o.balance = 0
+    
+    |Sum outstanding invoices
+    select sum(tcisn100.oamt)
+    from   tcisn100
+    where  tcisn100.ofbp = {:i.customer.code}
+    and    tcisn100.stat = tcisn.stat.open
+    selectdo
+        o.balance = sum(tcisn100.oamt)
+    endselect
+    
+    return(0)
+}`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                    if (currentIndex % 100 === 0) Prism.highlightElement(output);
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                    Prism.highlightElement(output);
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

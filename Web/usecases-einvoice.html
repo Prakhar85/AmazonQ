@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Cases - E-invoice India - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .capability-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .capability-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .capability-list li:before {
+            content: "📋 ";
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .india-flag {
+            background: linear-gradient(to bottom, #ff9933 33%, white 33%, white 66%, #138808 66%);
+            height: 20px;
+            width: 30px;
+            display: inline-block;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-file-invoice"></i> Use Cases - E-invoice India</h1>
+            <p><span class="india-flag"></span>Generate 4GL code for Indian E-invoicing compliance and integration</p>
+        </header>
+
+        <div class="content-card">
+            <h2 class="section-title">E-invoice India Capabilities</h2>
+            <ul class="capability-list">
+                <li>GST compliance validation and calculations</li>
+                <li>E-invoice JSON generation as per Indian standards</li>
+                <li>IRN (Invoice Reference Number) generation</li>
+                <li>QR code generation for e-invoices</li>
+                <li>API integration with GST portal</li>
+                <li>Digital signature implementation</li>
+                <li>Error handling for GST portal responses</li>
+                <li>Bulk e-invoice processing</li>
+            </ul>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: E-invoice JSON Generation</h4>
+                <div class="prompt-text">
+                    "Go through usecases folder and find a use case on 'E-invoice India' and give 4gl code for generating e-invoice JSON format as per Indian GST standards. Include all mandatory fields like seller details, buyer details, item details, and tax calculations."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> E-Invoicing_GST_Integration_UseCase.md, JSON_Functions_Compact_Guide.md, 4gl-core-rules.md, String_Operations.md, 4gl-error-handling-rules.md, api_methods_and_auth_compact.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: GST Portal Integration</h4>
+                <div class="prompt-text">
+                    "Find E-invoice India use case and create 4GL code for integrating with GST portal API. Include authentication, e-invoice submission, IRN retrieval, and error handling for various GST portal response codes."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> E-invoice_India_UseCase.md, api_methods_and_auth_compact.md, JSON_Functions_Compact_Guide.md, 4gl-api-http.md, api-logging-pattern.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Bulk E-invoice Processing</h4>
+                <div class="prompt-text">
+                    "Use E-invoice India use case to generate 4GL code for bulk processing of invoices for e-invoice generation. Include batch processing, progress tracking, error logging, and retry mechanism for failed invoices."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> E-invoice_India_UseCase.md, 4GL_Table_Operations_Guide.md, 4gl-advanced-patterns.md, api-logging-pattern.md, JSON_Functions_Compact_Guide.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+        </div>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Go through usecases folder and find a use case on 'E-invoice India' and give 4gl code for generating e-invoice JSON format as per Indian GST standards. Include all mandatory fields like seller details, buyer details, item details, and tax calculations.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">E-invoice India - GST JSON Generation</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> E-invoice India Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🇮🇳 GST compliance validation</li>
+                    <li style="padding: 5px 0;">📄 Standard e-invoice JSON format</li>
+                    <li style="padding: 5px 0;">🔐 Digital signature integration</li>
+                    <li style="padding: 5px 0;">📊 Tax calculation automation</li>
+                    <li style="padding: 5px 0;">🔗 GST portal API integration</li>
+                    <li style="padding: 5px 0;">📱 QR code generation</li>
+                    <li style="padding: 5px 0;">⚡ Bulk processing support</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Indian E-invoice Standards</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Document Details</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>Document Type</li>
+                        <li>Document Number</li>
+                        <li>Document Date</li>
+                        <li>Supply Type</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Seller Details</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>GSTIN</li>
+                        <li>Legal Name</li>
+                        <li>Address</li>
+                        <li>State Code</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Tax Details</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>CGST</li>
+                        <li>SGST/UTGST</li>
+                        <li>IGST</li>
+                        <li>CESS</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const code = `|#include <bic_json>
+|#include <bic_http>
+
+|E-Invoice JSON generation for Indian GST compliance
+function extern long generate.einvoice.json(
+	domain	tcorno			i.invoice.number,
+	domain	tcmcs.str20m		i.seller.gstin,
+	domain	tcmcs.str20m		i.buyer.gstin,
+	domain	tcamnt			i.taxable.amount,
+	ref	string			o.json.output(32000),
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+    long l.ret
+    long l.json.root
+    long l.seller.details
+    long l.buyer.details
+    long l.item.list
+    long l.item.object
+    long l.val.details
+    string l.current.date(10)
+    string l.temp.string(100)
+    double l.cgst.amount
+    double l.sgst.amount
+    double l.total.amount
+    
+    |MANDATORY: Initialize ALL variables
+    tt.init.vars(
+        l.ret,
+        l.json.root,
+        l.seller.details,
+        l.buyer.details,
+        l.item.list,
+        l.item.object,
+        l.val.details,
+        l.current.date,
+        l.temp.string,
+        l.cgst.amount,
+        l.sgst.amount,
+        l.total.amount,
+        o.json.output,
+        o.error
+    )
+    
+    |Validate mandatory fields for GST compliance
+    if isspace(i.invoice.number) then
+        o.error = "Invoice number is mandatory for e-invoice"
+        return(-12)
+    endif
+    
+    if isspace(i.seller.gstin) then
+        o.error = "Seller GSTIN is mandatory for GST compliance"
+        return(-12)
+    endif
+    
+    if isspace(i.buyer.gstin) then
+        o.error = "Buyer GSTIN is mandatory for B2B transactions"
+        return(-12)
+    endif
+    
+    |Create main JSON structure as per GST schema
+    l.json.root = Json.newObject()
+    if l.json.root = 0 then
+        o.error = "Failed to create JSON object"
+        return(-12)
+    endif
+    
+    |Document Details - Mandatory GST fields
+    Json.setString(l.json.root, "Version", "1.1")
+    Json.setString(l.json.root, "TranDtls", "")
+    Json.setString(l.json.root, "DocDtls", "")
+    
+    |Transaction Details
+    l.temp.string = "1"  |Regular B2B supply
+    Json.setString(l.json.root, "TaxSch", "GST")
+    Json.setString(l.json.root, "SupTyp", "B2B")
+    
+    |Document Details
+    Json.setString(l.json.root, "Typ", "INV")  |Invoice type
+    Json.setString(l.json.root, "No", i.invoice.number)
+    
+    |Get current date in DD/MM/YYYY format
+    l.current.date = date.to.string(utc.num(), "DD/MM/YYYY")
+    Json.setString(l.json.root, "Dt", l.current.date)
+    
+    |Seller Details - Complete GST information
+    l.seller.details = Json.newObject()
+    Json.setString(l.seller.details, "Gstin", i.seller.gstin)
+    Json.setString(l.seller.details, "LglNm", "Seller Legal Name")
+    Json.setString(l.seller.details, "TrdNm", "Seller Trade Name")
+    Json.setString(l.seller.details, "Addr1", "Seller Address Line 1")
+    Json.setString(l.seller.details, "Addr2", "Seller Address Line 2")
+    Json.setString(l.seller.details, "Loc", "Mumbai")
+    Json.setString(l.seller.details, "Pin", "400001")
+    Json.setString(l.seller.details, "Stcd", "27")  |Maharashtra state code
+    Json.setString(l.seller.details, "Ph", "9876543210")
+    Json.setString(l.seller.details, "Em", "seller@company.com")
+    
+    Json.set(l.json.root, "SellerDtls", l.seller.details)
+    
+    |Buyer Details - Complete GST information
+    l.buyer.details = Json.newObject()
+    Json.setString(l.buyer.details, "Gstin", i.buyer.gstin)
+    Json.setString(l.buyer.details, "LglNm", "Buyer Legal Name")
+    Json.setString(l.buyer.details, "TrdNm", "Buyer Trade Name")
+    Json.setString(l.buyer.details, "Pos", "07")  |Place of supply
+    Json.setString(l.buyer.details, "Addr1", "Buyer Address Line 1")
+    Json.setString(l.buyer.details, "Addr2", "Buyer Address Line 2")
+    Json.setString(l.buyer.details, "Loc", "Delhi")
+    Json.setString(l.buyer.details, "Pin", "110001")
+    Json.setString(l.buyer.details, "Stcd", "07")  |Delhi state code
+    Json.setString(l.buyer.details, "Ph", "9876543211")
+    Json.setString(l.buyer.details, "Em", "buyer@company.com")
+    
+    Json.set(l.json.root, "BuyerDtls", l.buyer.details)
+    
+    |Item List with proper GST calculations
+    l.item.list = Json.newArray()
+    l.item.object = Json.newObject()
+    
+    |Calculate GST amounts (18% = 9% CGST + 9% SGST)
+    l.cgst.amount = i.taxable.amount * 0.09
+    l.sgst.amount = i.taxable.amount * 0.09
+    l.total.amount = i.taxable.amount + l.cgst.amount + l.sgst.amount
+    
+    |Item details as per GST schema
+    Json.setString(l.item.object, "SlNo", "1")
+    Json.setString(l.item.object, "PrdDesc", "Product Description")
+    Json.setString(l.item.object, "IsServc", "N")  |Goods, not service
+    Json.setString(l.item.object, "HsnCd", "1234")  |HSN code mandatory
+    Json.setString(l.item.object, "Barcde", "")
+    Json.setNumber(l.item.object, "Qty", 1)
+    Json.setNumber(l.item.object, "FreeQty", 0)
+    Json.setString(l.item.object, "Unit", "NOS")
+    Json.setNumber(l.item.object, "UnitPrice", i.taxable.amount)
+    Json.setNumber(l.item.object, "TotAmt", i.taxable.amount)
+    Json.setNumber(l.item.object, "Discount", 0)
+    Json.setNumber(l.item.object, "PreTaxVal", i.taxable.amount)
+    Json.setNumber(l.item.object, "AssAmt", i.taxable.amount)
+    Json.setNumber(l.item.object, "GstRt", 18)  |Total GST rate
+    Json.setNumber(l.item.object, "IgstAmt", 0)  |Inter-state GST
+    Json.setNumber(l.item.object, "CgstAmt", l.cgst.amount)
+    Json.setNumber(l.item.object, "SgstAmt", l.sgst.amount)
+    Json.setNumber(l.item.object, "CesRt", 0)  |Cess rate
+    Json.setNumber(l.item.object, "CesAmt", 0)  |Cess amount
+    Json.setNumber(l.item.object, "CesNonAdvlAmt", 0)
+    Json.setNumber(l.item.object, "StateCesRt", 0)
+    Json.setNumber(l.item.object, "StateCesAmt", 0)
+    Json.setNumber(l.item.object, "StateCesNonAdvlAmt", 0)
+    Json.setNumber(l.item.object, "OthChrg", 0)
+    Json.setNumber(l.item.object, "TotItemVal", l.total.amount)
+    
+    Json.add(l.item.list, l.item.object)
+    Json.set(l.json.root, "ItemList", l.item.list)
+    
+    |Value Details - Summary amounts for GST
+    l.val.details = Json.newObject()
+    Json.setNumber(l.val.details, "AssVal", i.taxable.amount)
+    Json.setNumber(l.val.details, "CgstVal", l.cgst.amount)
+    Json.setNumber(l.val.details, "SgstVal", l.sgst.amount)
+    Json.setNumber(l.val.details, "IgstVal", 0)
+    Json.setNumber(l.val.details, "CesVal", 0)
+    Json.setNumber(l.val.details, "StCesVal", 0)
+    Json.setNumber(l.val.details, "Discount", 0)
+    Json.setNumber(l.val.details, "OthChrg", 0)
+    Json.setNumber(l.val.details, "RndOffAmt", 0)
+    Json.setNumber(l.val.details, "TotInvVal", l.total.amount)
+    
+    Json.set(l.json.root, "ValDtls", l.val.details)
+    
+    |Convert JSON to string for e-invoice submission
+    l.ret = Json.writeString(l.json.root, o.json.output)
+    if l.ret <> 0 then
+        o.error = "Failed to convert JSON to string"
+        Json.delete(l.json.root)
+        return(-12)
+    endif
+    
+    |Cleanup JSON objects - mandatory memory management
+    Json.delete(l.json.root)
+    
+    return(0)
+}`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

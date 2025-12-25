@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predefined Functions - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 40px; padding: 40px 0; }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: white; text-decoration: none; margin-bottom: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 25px; transition: background 0.3s ease; }
+        .back-link:hover { background: rgba(255,255,255,0.3); }
+        .content-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .section-title { font-size: 1.8rem; color: #667eea; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .function-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin: 20px 0; }
+        .function-category { background: #f8f9fa; padding: 25px; border-radius: 15px; border-left: 4px solid #667eea; transition: all 0.3s ease; }
+        .function-category:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .function-category h4 { color: #667eea; margin-bottom: 15px; font-size: 1.2rem; }
+        .function-list { list-style: none; padding: 0; }
+        .function-list li { padding: 5px 0; font-family: 'Courier New', monospace; font-size: 0.9rem; color: #555; border-bottom: 1px solid #eee; }
+        .function-list li:last-child { border-bottom: none; }
+        .function-syntax { color: #28a745; font-weight: bold; }
+        .highlight-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 15px; margin: 25px 0; }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin: 20px 0; }
+        .stat-item { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-function"></i> Predefined Functions</h1>
+            <p>Most commonly used 4GL predefined functions for efficient development</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Show me the most commonly used 4GL predefined functions with examples for string operations, database operations, and date/time handling.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Predefined Functions - Most Used Examples</div>
+                </div>
+                <div class="ide-content">
+                    <pre><code id="code-output" class="language-c code-editor"></code></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h2 style="margin-bottom: 20px;">4GL Predefined Functions Library</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">200+</div>
+                        <div>Total Functions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div>Most Used</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">20+</div>
+                        <div>Categories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div>Tested</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Most Used Functions</h2>
+            <div class="function-grid">
+                <div class="function-category">
+                    <h4><i class="fas fa-font"></i> String Operations</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">len()</span> - Get string length</li>
+                        <li><span class="function-syntax">trim$()</span> - Remove leading/trailing spaces</li>
+                        <li><span class="function-syntax">strip$()</span> - Remove all spaces</li>
+                        <li><span class="function-syntax">pos()</span> - Find substring position</li>
+                        <li><span class="function-syntax">str$()</span> - Convert to string</li>
+                        <li><span class="function-syntax">val()</span> - Convert to number</li>
+                        <li><span class="function-syntax">toupper$()</span> - Convert to uppercase</li>
+                        <li><span class="function-syntax">tolower$()</span> - Convert to lowercase</li>
+                        <li><span class="function-syntax">str.substring$()</span> - Extract substring</li>
+                        <li><span class="function-syntax">str.replace$()</span> - Replace text</li>
+                    </ul>
+                </div>
+
+                <div class="function-category">
+                    <h4><i class="fas fa-database"></i> Database Operations</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">dal.new.object()</span> - Create new record</li>
+                        <li><span class="function-syntax">dal.save.object()</span> - Save record</li>
+                        <li><span class="function-syntax">dal.set.field()</span> - Set field value</li>
+                        <li><span class="function-syntax">dal.get.field()</span> - Get field value</li>
+                        <li><span class="function-syntax">dal.destroy.object()</span> - Delete record</li>
+                        <li><span class="function-syntax">commit.transaction()</span> - Commit changes</li>
+                        <li><span class="function-syntax">abort.transaction()</span> - Rollback changes</li>
+                        <li><span class="function-syntax">db.retry.point()</span> - Set retry point</li>
+                        <li><span class="function-syntax">get.compnr()</span> - Get company number</li>
+                        <li><span class="function-syntax">isspace()</span> - Check if empty</li>
+                    </ul>
+                </div>
+
+                <div class="function-category">
+                    <h4><i class="fas fa-clock"></i> Date & Time Functions</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">utc.num()</span> - Current UTC timestamp</li>
+                        <li><span class="function-syntax">date.num()</span> - Current date number</li>
+                        <li><span class="function-syntax">time.num()</span> - Current time number</li>
+                        <li><span class="function-syntax">num.to.date$()</span> - Convert number to date</li>
+                        <li><span class="function-syntax">date.to.num()</span> - Convert date to number</li>
+                        <li><span class="function-syntax">date.to.utc()</span> - Convert to UTC</li>
+                        <li><span class="function-syntax">week.to.num()</span> - Week to number</li>
+                        <li><span class="function-syntax">num.to.week()</span> - Number to week</li>
+                    </ul>
+                </div>
+
+                <div class="function-category">
+                    <h4><i class="fas fa-calculator"></i> Mathematical Operations</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">abs()</span> - Absolute value</li>
+                        <li><span class="function-syntax">round()</span> - Round number</li>
+                        <li><span class="function-syntax">int()</span> - Integer part</li>
+                        <li><span class="function-syntax">max()</span> - Maximum value</li>
+                        <li><span class="function-syntax">min()</span> - Minimum value</li>
+                        <li><span class="function-syntax">pow()</span> - Power function</li>
+                        <li><span class="function-syntax">sqrt()</span> - Square root</li>
+                        <li><span class="function-syntax">random()</span> - Random number</li>
+                    </ul>
+                </div>
+
+                <div class="function-category">
+                    <h4><i class="fas fa-list"></i> Enum & Domain Operations</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">enum.descr$()</span> - Get enum description</li>
+                        <li><span class="function-syntax">etol()</span> - Enum to long</li>
+                        <li><span class="function-syntax">ltoe()</span> - Long to enum</li>
+                        <li><span class="function-syntax">btol()</span> - Boolean to long</li>
+                        <li><span class="function-syntax">ltob()</span> - Long to boolean</li>
+                        <li><span class="function-syntax">rdi.etoc$()</span> - Enum to code</li>
+                    </ul>
+                </div>
+
+                <div class="function-category">
+                    <h4><i class="fas fa-user"></i> System & User Information</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">logname$()</span> - Current user name</li>
+                        <li><span class="function-syntax">hostname$()</span> - Host name</li>
+                        <li><span class="function-syntax">bse.dir$()</span> - BSE directory</li>
+                        <li><span class="function-syntax">bse.tmp.dir$()</span> - Temp directory</li>
+                        <li><span class="function-syntax">get.var()</span> - Get variable</li>
+                        <li><span class="function-syntax">set.var()</span> - Set variable</li>
+                    </ul>
+                </div>
+
+                <div class="function-category">
+                    <h4><i class="fas fa-file"></i> File Operations</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">seq.open()</span> - Open file</li>
+                        <li><span class="function-syntax">seq.close()</span> - Close file</li>
+                        <li><span class="function-syntax">seq.puts()</span> - Write line</li>
+                        <li><span class="function-syntax">seq.gets()</span> - Read line</li>
+                        <li><span class="function-syntax">seq.unlink()</span> - Delete file</li>
+                        <li><span class="function-syntax">path.exists()</span> - Check file exists</li>
+                        <li><span class="function-syntax">file.stat()</span> - Get file info</li>
+                        <li><span class="function-syntax">creat.tmp.file$()</span> - Create temp file</li>
+                    </ul>
+                </div>
+
+                <div class="function-category">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Message & Error Handling</h4>
+                    <ul class="function-list">
+                        <li><span class="function-syntax">message()</span> - Display message</li>
+                        <li><span class="function-syntax">mess()</span> - Display coded message</li>
+                        <li><span class="function-syntax">dal.set.error.message()</span> - Set DAL error</li>
+                        <li><span class="function-syntax">get.dal.all.messages()</span> - Get all errors</li>
+                        <li><span class="function-syntax">choice.again()</span> - Repeat choice</li>
+                        <li><span class="function-syntax">input.again()</span> - Repeat input</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-lightbulb"></i> Function Categories</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Most Used (50+)</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 3px 0;">✓ String operations</li>
+                            <li style="padding: 3px 0;">✓ Database operations</li>
+                            <li style="padding: 3px 0;">✓ Date/time functions</li>
+                            <li style="padding: 3px 0;">✓ Mathematical operations</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Moderate (100+)</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 3px 0;">✓ Process management</li>
+                            <li style="padding: 3px 0;">✓ Multi-language support</li>
+                            <li style="padding: 3px 0;">✓ Security functions</li>
+                            <li style="padding: 3px 0;">✓ Query extensions</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Advanced (50+)</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 3px 0;">✓ SOAP/XML processing</li>
+                            <li style="padding: 3px 0;">✓ Encryption/security</li>
+                            <li style="padding: 3px 0;">✓ Java integration</li>
+                            <li style="padding: 3px 0;">✓ Chart/graph functions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = `|Most Used 4GL Predefined Functions - Complete Reference
+|Based on Dataset/06-PredefinedFunctions/01-MostUsed/
+
+|=== STRING OPERATIONS ===
+
+function string process.customer.name(
+\tdomain tcmcs.str60m i.customer.name
+)
+{
+\tstring l.processed.name(60)
+\tlong l.name.length
+\tlong l.space.position
+\t
+\ttt.init.vars(
+\t\tl.processed.name,
+\t\tl.name.length,
+\t\tl.space.position
+\t)
+\t
+\t|Check if name is empty
+\tif isspace(i.customer.name) then
+\t\treturn("Unknown Customer")
+\tendif
+\t
+\t|Get string length
+\tl.name.length = len(i.customer.name)
+\t
+\t|Remove leading/trailing spaces
+\tl.processed.name = trim$(i.customer.name)
+\t
+\t|Convert to proper case (first letter uppercase)
+\tif l.name.length > 0 then
+\t\tl.processed.name = toupper$(str.substring$(l.processed.name, 1, 1)) &
+\t\t                  tolower$(str.substring$(l.processed.name, 2))
+\tendif
+\t
+\t|Find position of space for last name processing
+\tl.space.position = pos(" ", l.processed.name)
+\tif l.space.position > 0 then
+\t\t|Process last name to uppercase
+\t\tl.processed.name = str.substring$(l.processed.name, 1, l.space.position) &
+\t\t                  toupper$(str.substring$(l.processed.name, l.space.position + 1, 1)) &
+\t\t                  tolower$(str.substring$(l.processed.name, l.space.position + 2))
+\tendif
+\t
+\treturn(l.processed.name)
+}
+
+|=== DATABASE OPERATIONS ===
+
+function long create.customer.record(
+\tdomain tccom.bpid i.customer.code,
+\tdomain tcmcs.str60m i.customer.name,
+\tref domain tcmcs.str999m o.error
+)
+{
+\tlong l.ret
+\t
+\ttt.init.vars(l.ret, o.error)
+\t
+\t|Set database retry point
+\tdb.retry.point()
+\t
+\t|Create new customer object
+\tl.ret = dal.new.object("tccom100")
+\tif l.ret <> 0 then
+\t\to.error = "Failed to create customer object"
+\t\treturn(-12)
+\tendif
+\t
+\t|Set field values
+\tdal.set.field("tccom100.bpid", i.customer.code)
+\tdal.set.field("tccom100.nama", i.customer.name)
+\tdal.set.field("tccom100.stat", tccom.stat.active)
+\tdal.set.field("tccom100.cdat", utc.num())
+\tdal.set.field("tccom100.logn", logname$())
+\t
+\t|Save the object
+\tl.ret = dal.save.object("tccom100")
+\tif l.ret <> 0 then
+\t\tget.dal.all.messages(o.error)
+\t\tabort.transaction()
+\t\treturn(-12)
+\tendif
+\t
+\t|Commit transaction
+\tcommit.transaction()
+\t
+\treturn(0)
+}
+
+|=== DATE/TIME OPERATIONS ===
+
+function string format.business.date(
+\tdomain ttdate i.business.date
+)
+{
+\tlong l.year
+\tlong l.month
+\tlong l.day
+\tstring l.formatted.date(20)
+\t
+\ttt.init.vars(
+\t\tl.year,
+\t\tl.month,
+\t\tl.day,
+\t\tl.formatted.date
+\t)
+\t
+\t|Convert date number to components
+\tnum.to.date(i.business.date, l.year, l.month, l.day)
+\t
+\t|Format as DD/MM/YYYY
+\tl.formatted.date = str$(l.day) & "/" & str$(l.month) & "/" & str$(l.year)
+\t
+\treturn(l.formatted.date)
+}
+
+function long calculate.days.between(
+\tdomain ttdate i.start.date,
+\tdomain ttdate i.end.date
+)
+{
+\tlong l.days.difference
+\t
+\t|Simple date arithmetic
+\tl.days.difference = i.end.date - i.start.date
+\t
+\treturn(l.days.difference)
+}
+
+|=== MATHEMATICAL OPERATIONS ===
+
+function double calculate.percentage(
+\tdouble i.part.value,
+\tdouble i.total.value
+)
+{
+\tdouble l.percentage
+\t
+\ttt.init.vars(l.percentage)
+\t
+\t|Avoid division by zero
+\tif i.total.value = 0 then
+\t\treturn(0)
+\tendif
+\t
+\t|Calculate percentage
+\tl.percentage = (i.part.value / i.total.value) * 100
+\t
+\t|Round to 2 decimal places
+\tl.percentage = round(l.percentage, 2, 0)
+\t
+\treturn(l.percentage)
+}
+
+|=== ENUM OPERATIONS ===
+
+function string get.status.description(
+\tdomain tccom.stat i.status.code
+)
+{
+\tstring l.status.description(50)
+\t
+\ttt.init.vars(l.status.description)
+\t
+\t|Get enum description
+\tl.status.description = enum.descr$("tccom.stat", i.status.code)
+\t
+\t|Handle empty description
+\tif isspace(l.status.description) then
+\t\tl.status.description = "Unknown Status"
+\tendif
+\t
+\treturn(l.status.description)
+}
+
+|=== FILE OPERATIONS ===
+
+function long write.log.entry(
+\tdomain tcmcs.str256m i.log.message
+)
+{
+\tlong l.fp
+\tstring l.log.file(256)
+\tstring l.timestamp(20)
+\tstring l.log.entry(512)
+\t
+\ttt.init.vars(
+\t\tl.fp,
+\t\tl.log.file,
+\t\tl.timestamp,
+\t\tl.log.entry
+\t)
+\t
+\t|Create log file path
+\tl.log.file = bse.tmp.dir$() & "application.log"
+\t
+\t|Open file for append
+\tl.fp = seq.open(l.log.file, "a")
+\tif l.fp <= 0 then
+\t\treturn(-12)
+\tendif
+\t
+\t|Create timestamped entry
+\tl.timestamp = num.to.date$(date.num(), 2)
+\tl.log.entry = l.timestamp & " - " & logname$() & " - " & i.log.message
+\t
+\t|Write to file
+\tseq.puts(l.log.entry, l.fp)
+\t
+\t|Close file
+\tseq.close(l.fp)
+\t
+\treturn(0)
+}`
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                    if (currentIndex % 100 === 0) Prism.highlightElement(output);
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                    Prism.highlightElement(output);
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

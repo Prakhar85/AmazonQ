@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trusted Functions Library - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 40px; padding: 40px 0; }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: white; text-decoration: none; margin-bottom: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 25px; transition: background 0.3s ease; }
+        .back-link:hover { background: rgba(255,255,255,0.3); }
+        .content-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .section-title { font-size: 1.8rem; color: #667eea; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .example-prompt { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 15px 0; border-radius: 5px; }
+        .example-prompt h4 { color: #667eea; margin-bottom: 10px; }
+        .prompt-text { font-style: italic; color: #555; margin-bottom: 10px; }
+        .files-loaded { background: #e8f5e8; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
+        .files-loaded strong { color: #28a745; }
+        .capability-list { list-style: none; padding: 0; }
+        .capability-list li { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .capability-list li:before { content: "⚡ "; color: #667eea; font-weight: bold; }
+        .highlight-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0  10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+        .function-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .function-category { background: #f8f9fa; border-radius: 10px; padding: 20px; border-left: 4px solid #667eea; }
+        .function-category h4 { color: #667eea; margin-bottom: 15px; }
+        .function-list { list-style: none; padding: 0; }
+        .function-list li { padding: 5px 0; font-family: 'Courier New', monospace; font-size: 0.9rem; color: #555; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-code-branch"></i> Trusted Functions Library</h1>
+            <p>Comprehensive reference for validated 4GL functions across all development categories</p>
+        </header>
+
+        <div class="content-card">
+            <h2 class="section-title">Function Categories</h2>
+            <div class="function-grid">
+                <div class="function-category">
+                    <h4><i class="fas fa-code"></i> Core Functions</h4>
+                    <ul class="function-list">
+                        <li>len()</li>
+                        <li>str$()</li>
+                        <li>val()</li>
+                        <li>isspace()</li>
+                        <li>pos()</li>
+                        <li>trim$()</li>
+                        <li>toupper$()</li>
+                        <li>tolower$()</li>
+                        <li>str.substring$()</li>
+                        <li>str.replace$()</li>
+                    </ul>
+                </div>
+                <div class="function-category">
+                    <h4><i class="fas fa-database"></i> Database Functions</h4>
+                    <ul class="function-list">
+                        <li>dal.new.object()</li>
+                        <li>dal.save.object()</li>
+                        <li>dal.destroy.object()</li>
+                        <li>dal.set.field()</li>
+                        <li>dal.change.object()</li>
+                        <li>dal.set.error.message()</li>
+                        <li>commit.transaction()</li>
+                        <li>db.insert()</li>
+                        <li>db.update()</li>
+                        <li>db.delete()</li>
+                    </ul>
+                </div>
+                <div class="function-category">
+                    <h4><i class="fas fa-globe"></i> HTTP Functions</h4>
+                    <ul class="function-list">
+                        <li>http.get()</li>
+                        <li>http.post()</li>
+                        <li>http.put()</li>
+                        <li>http.delete()</li>
+                        <li>http.headerlist.new()</li>
+                        <li>http.headerlist.add()</li>
+                        <li>http.queryparamlist.new()</li>
+                        <li>http.oauth2params.new()</li>
+                        <li>base64.encode()</li>
+                        <li>base64.decode()</li>
+                    </ul>
+                </div>
+                <div class="function-category">
+                    <h4><i class="fas fa-file-code"></i> JSON/XML Functions</h4>
+                    <ul class="function-list">
+                        <li>Json.parseFromString()</li>
+                        <li>Json.newObject()</li>
+                        <li>Json.setString()</li>
+                        <li>Json.getString()</li>
+                        <li>Json.destroy()</li>
+                        <li>xmlReadFromString()</li>
+                        <li>xmlNewNode()</li>
+                        <li>xmlSetAttribute()</li>
+                        <li>xmlGetNodeValue()</li>
+                        <li>xmlDeleteNode()</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: String Processing Functions</h4>
+                <div class="prompt-text">
+                    "Show me all trusted string manipulation functions for 4GL. Include examples of string concatenation, substring extraction, and format validation."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> core_functions.json, utility_misc_functions.json, 4gl-string-operations.md, dynamic-memory-string-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Database Operation Functions</h4>
+                <div class="prompt-text">
+                    "Generate code using trusted DAL functions for table operations. Include object creation, field validation, and error handling patterns."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> database_functions.json, DAL_Complete_Guide.md, 4GL_Table_Operations_Guide.md, auto-function-validation.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: HTTP Integration Functions</h4>
+                <div class="prompt-text">
+                    "Create REST API integration using only trusted HTTP functions. Include OAuth2 authentication, request handling, and response processing."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> http_network_functions.json, api_methods_and_auth_compact.md, json_xml_functions.json, 4gl-api-http.md
+                </div>
+            </div>
+        </div>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Show me all trusted string manipulation functions for 4GL. Include examples of string concatenation, substring extraction, and format validation.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Trusted Functions - String Operations</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-shield-alt"></i> Trusted Functions Benefits</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">✓ Validated and tested functions only</li>
+                    <li style="padding: 5px 0;">✓ Proper error handling patterns</li>
+                    <li style="padding: 5px 0;">✓ Memory management compliance</li>
+                    <li style="padding: 5px 0;">✓ Performance optimized</li>
+                    <li style="padding: 5px 0;">✓ Security best practices</li>
+                    <li style="padding: 5px 0;">✓ Cross-platform compatibility</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = `|Trusted Functions Library - Complete Reference
+|All functions listed are validated and marked as "trusted": true
+
+|=== CORE STRING FUNCTIONS ===
+
+|String length and validation using trusted functions
+function long validate.string.input(
+	domain tcmcs.str256m i.input.string,
+	long i.min.length,
+	long i.max.length,
+	ref domain tcmcs.str999m o.error
+)
+{
+	long l.string.length
+	
+	tt.init.vars(l.string.length, o.error)
+	
+	|TRUSTED: len() function from core_functions.json
+	l.string.length = len(i.input.string)
+	
+	if l.string.length < i.min.length then
+		|TRUSTED: str$() function for conversion
+		o.error = "String too short. Minimum " & str$(i.min.length) & " characters"
+		return(-12)
+	endif
+	
+	if l.string.length > i.max.length then
+		o.error = "String too long. Maximum " & str$(i.max.length) & " characters"
+		return(-12)
+	endif
+	
+	|TRUSTED: isspace() function
+	if isspace(i.input.string) then
+		o.error = "String cannot be empty"
+		return(-12)
+	endif
+	
+	return(0)
+}
+
+|=== DATABASE FUNCTIONS ===
+
+|Customer creation using trusted DAL functions
+function long create.customer.record(
+	domain tccom.bpid i.customer.code,
+	domain tcmcs.str60m i.customer.name,
+	ref domain tcmcs.str999m o.error
+)
+{
+	long l.ret
+	
+	tt.init.vars(l.ret, o.error)
+	
+	|TRUSTED: dal.new.object() from database_functions.json
+	l.ret = dal.new.object("tccom100")
+	if l.ret <> 0 then
+		o.error = "Failed to create new customer object"
+		return(-12)
+	endif
+	
+	|TRUSTED: dal.set.field() function
+	dal.set.field("tccom100.bpid", i.customer.code)
+	dal.set.field("tccom100.nama", i.customer.name)
+	dal.set.field("tccom100.stat", tccom.stat.active)
+	
+	|TRUSTED: dal.save.object() function
+	l.ret = dal.save.object("tccom100")
+	if l.ret <> 0 then
+		|TRUSTED: dal.set.error.message() function
+		dal.set.error.message("Failed to save customer record")
+		return(-12)
+	endif
+	
+	|TRUSTED: commit.transaction() function
+	commit.transaction()
+	
+	return(0)
+}
+
+|=== HTTP FUNCTIONS ===
+
+|REST API call using trusted HTTP functions
+function long make.api.request(
+	domain tcmcs.str256m i.endpoint.url,
+	domain tcmcs.str999m i.request.body,
+	ref domain tcmcs.str999m o.response,
+	ref domain tcmcs.str999m o.error
+)
+{
+	long l.ret
+	long l.header.list
+	
+	tt.init.vars(
+		l.ret,
+		l.header.list,
+		o.response,
+		o.error
+	)
+	
+	|TRUSTED: http.headerlist.new() from http_network_functions.json
+	l.header.list = http.headerlist.new()
+	
+	|TRUSTED: http.headerlist.add() function
+	http.headerlist.add(
+		l.header.list,
+		"Content-Type",
+		"application/json"
+	)
+	
+	|TRUSTED: http.post() function
+	l.ret = http.post(
+		i.endpoint.url,
+		HTTP_HEADERLIST,
+		l.header.list,
+		HTTP_REQUESTBODYSTRING,
+		i.request.body,
+		HTTP_RESPONSEBODYSTRING,
+		o.response
+	)
+	
+	if l.ret <> 0 then
+		o.error = "HTTP request failed with code: " & str$(l.ret)
+		return(-12)
+	endif
+	
+	return(0)
+}
+
+|=== STRING MANIPULATION ===
+
+|Text processing using trusted string functions
+function string format.customer.display(
+	domain tccom.bpid i.customer.code,
+	domain tcmcs.str60m i.customer.name
+)
+{
+	string l.formatted.string(256)
+	string l.temp.string(100)
+	long l.name.length
+	
+	tt.init.vars(
+		l.formatted.string,
+		l.temp.string,
+		l.name.length
+	)
+	
+	|TRUSTED: String concatenation
+	l.formatted.string = i.customer.code
+	
+	if not isspace(i.customer.name) then
+		|TRUSTED: len() function
+		l.name.length = len(i.customer.name)
+		
+		if l.name.length > 30 then
+			|TRUSTED: str.substring$() function
+			l.temp.string = str.substring$(i.customer.name, 1, 30)
+			l.temp.string = l.temp.string & "..."
+		else
+			l.temp.string = i.customer.name
+		endif
+		
+		|TRUSTED: trim$() function
+		l.temp.string = trim$(l.temp.string)
+		
+		|TRUSTED: toupper$() function
+		l.temp.string = toupper$(l.temp.string)
+		
+		l.formatted.string = l.formatted.string & " - " & l.temp.string
+	endif
+	
+	return(l.formatted.string)
+}`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

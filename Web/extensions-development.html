@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extensions Development - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .extension-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 20px 0;
+        }
+
+        .extension-item {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .extension-item:hover {
+            border-color: #667eea;
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .extension-item i {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .extension-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .code-sample {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-list li:before {
+            content: "⚡ ";
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .extension-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .flow-box {
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-puzzle-piece"></i> Extensions Development</h1>
+            <p>Generate BOD, Table, Session, Menu, Report, and Process extensions with complete functionality</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Give BOD extension code for adding custom fields to sales order BOD. Include customer priority level, special instructions, and delivery preferences in UserArea. Load necessary files from master rules.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Extensions Development - BOD Extension</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">Extension Types</h2>
+            <div class="extension-types">
+                <div class="extension-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h4>BOD Extensions</h4>
+                    <p>Extend Business Object Documents with custom fields and processing logic</p>
+                </div>
+                <div class="extension-item">
+                    <i class="fas fa-table"></i>
+                    <h4>Table Extensions</h4>
+                    <p>Add custom fields and validation to existing LN tables</p>
+                </div>
+                <div class="extension-item">
+                    <i class="fas fa-window-maximize"></i>
+                    <h4>Session Extensions</h4>
+                    <p>Enhance sessions with additional functionality and custom logic</p>
+                </div>
+                <div class="extension-item">
+                    <i class="fas fa-bars"></i>
+                    <h4>Menu Extensions</h4>
+                    <p>Add custom menu items and navigation options</p>
+                </div>
+                <div class="extension-item">
+                    <i class="fas fa-file-alt"></i>
+                    <h4>Report Extensions</h4>
+                    <p>Extend reports with additional data sources and formatting</p>
+                </div>
+                <div class="extension-item">
+                    <i class="fas fa-cogs"></i>
+                    <h4>Process Extensions</h4>
+                    <p>Customize business processes with hooks and additional logic</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: BOD Extension for Sales Orders</h4>
+                <div class="prompt-text">
+                    "Give BOD extension code for adding custom fields to sales order BOD. Include customer priority level, special instructions, and delivery preferences in UserArea. Load necessary files from master rules."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> BOD_Extension_Development_Guide.md, 4GL_Table_Definition_Guide.md, 4GL_Table_Operations_Guide.md, 4gl-error-handling-rules.md, enum-domain-assignment-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Table Extension with Validation</h4>
+                <div class="prompt-text">
+                    "Create table extension for customer master with additional fields for credit rating, payment terms, and risk category. Include validation hooks and business logic for credit limit checking."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Table_Extension_Development_Guide.md, 4gl-error-handling-rules.md, 4GL_Table_Definition_Guide.md, 4GL_Table_Operations_Guide.md, 4gl-validation.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Process Extension for Order Approval</h4>
+                <div class="prompt-text">
+                    "Generate process extension code for sales order approval workflow. Include multi-level approval based on order value, automatic notifications, and audit trail logging."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Process Extensions.md, Process Extensions explained.md, 4gl-error-handling-rules.md, 4GL_Table_Operations_Guide.md, 4gl-advanced-patterns.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">BOD Extension Flow</h2>
+            <div class="extension-flow">
+                <div class="flow-box">Standard BOD</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Extension Hook</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Custom Fields</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Enhanced BOD</div>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: #667eea; margin-bottom: 15px;">BOD Extension Components:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Identifier Extraction:</strong><br>
+                        <small>getIdentifierValueFromIdentifierStructure()</small>
+                    </div>
+                    <div>
+                        <strong>UserArea Addition:</strong><br>
+                        <small>addValue/addCodeValue macros</small>
+                    </div>
+                    <div>
+                        <strong>Error Handling:</strong><br>
+                        <small>dal.set.error.message()</small>
+                    </div>
+                    <div>
+                        <strong>Hook Integration:</strong><br>
+                        <small>before/after processing hooks</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> Extension Features</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4 style="margin-bottom: 15px;">BOD Extensions</h4>
+                        <ul class="feature-list">
+                            <li>UserArea field addition</li>
+                            <li>Identifier-based processing</li>
+                            <li>Custom validation logic</li>
+                            <li>Error handling integration</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Table Extensions</h4>
+                        <ul class="feature-list">
+                            <li>Custom field definitions</li>
+                            <li>Validation hooks</li>
+                            <li>Business rule enforcement</li>
+                            <li>Data integrity checks</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 15px;">Process Extensions</h4>
+                        <ul class="feature-list">
+                            <li>Workflow customization</li>
+                            <li>Approval mechanisms</li>
+                            <li>Notification systems</li>
+                            <li>Audit trail logging</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Extension Development Process</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 10px;">
+                    <h4 style="color: #28a745; margin-bottom: 15px;">1. Analysis</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Identify extension requirements</li>
+                        <li>Analyze existing functionality</li>
+                        <li>Define custom fields/logic</li>
+                        <li>Plan integration points</li>
+                    </ul>
+                </div>
+                <div style="background: #fff3cd; padding: 20px; border-radius: 10px;">
+                    <h4 style="color: #856404; margin-bottom: 15px;">2. Design</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Create extension structure</li>
+                        <li>Define hook points</li>
+                        <li>Design validation rules</li>
+                        <li>Plan error handling</li>
+                    </ul>
+                </div>
+                <div style="background: #d1ecf1; padding: 20px; border-radius: 10px;">
+                    <h4 style="color: #0c5460; margin-bottom: 15px;">3. Implementation</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Generate extension code</li>
+                        <li>Implement business logic</li>
+                        <li>Add validation hooks</li>
+                        <li>Test functionality</li>
+                    </ul>
+                </div>
+                <div style="background: #f8d7da; padding: 20px; border-radius: 10px;">
+                    <h4 style="color: #721c24; margin-bottom: 15px;">4. Deployment</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Package extension</li>
+                        <li>Deploy to environment</li>
+                        <li>Configure settings</li>
+                        <li>Validate operation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Extension Best Practices</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div>
+                        <h5 style="color: #667eea; margin-bottom: 10px;">🔧 Technical Guidelines</h5>
+                        <ul style="font-size: 0.9rem;">
+                            <li>Use proper naming conventions</li>
+                            <li>Implement comprehensive error handling</li>
+                            <li>Follow LN extension patterns</li>
+                            <li>Maintain backward compatibility</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 style="color: #667eea; margin-bottom: 10px;">📋 Business Rules</h5>
+                        <ul style="font-size: 0.9rem;">
+                            <li>Validate business logic thoroughly</li>
+                            <li>Implement proper authorization</li>
+                            <li>Maintain data integrity</li>
+                            <li>Document business requirements</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 style="color: #667eea; margin-bottom: 10px;">⚡ Performance</h5>
+                        <ul style="font-size: 0.9rem;">
+                            <li>Optimize database queries</li>
+                            <li>Minimize processing overhead</li>
+                            <li>Use efficient algorithms</li>
+                            <li>Monitor resource usage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Sample Extension Code Structure</h2>
+            <div class="code-sample">
+| BOD Extension Example
+function long extend.sales.order.bod(
+    domain  tcmcs.str256m  i.xml.data,
+    ref domain tcmcs.str999m o.error
+)
+{
+    long l.ret
+    string l.customer.priority(10)
+    string l.special.instructions(256)
+    
+    tt.init.vars(
+        l.ret,
+        l.customer.priority,
+        l.special.instructions,
+        o.error
+    )
+    
+    | Extract identifier values
+    l.ret = getIdentifierValueFromIdentifierStructure(
+        "OrderNumber",
+        i.xml.data,
+        l.order.number
+    )
+    
+    | Add custom fields to UserArea
+    addCodeValue("CustomerPriority", l.customer.priority)
+    addValue("SpecialInstructions", l.special.instructions)
+    
+    return(l.ret)
+}
+            </div>
+        </div>
+    </div>
+    <script>
+        const code = `| BOD Extension: Sales Order Custom Fields
+| Using correct BOD Extension macros from BOD_Extension_Development_Guide.md
+
+|Variable declarations inside case and if statements (MANDATORY l. prefix)
+long l.retl
+long l.header.xml
+domain tcorno l.order.number
+string l.customer.priority(10)
+string l.special.instructions(256)
+string l.delivery.preference(50)
+domain tcyesno l.rush.order
+
+tt.init.vars(
+	l.retl,
+	l.header.xml,
+	l.order.number,
+	l.customer.priority,
+	l.special.instructions,
+	l.delivery.preference,
+	l.rush.order
+)
+
+|Get component identifiers using correct function
+l.retl = getTableIdentifiers.SalesOrderBOD(l.header.xml)
+
+|Extract order number from identifier structure
+l.order.number = getIdentifierValueFromIdentifierStructure(
+	l.header.xml,
+	"tdsls400",
+	"orno"
+)
+
+|Query sales order data
+select tdsls400.ofbp,
+       tdsls400.rem1,
+       tdsls400.dlvm,
+       tdsls400.rush
+from   tdsls400
+where  tdsls400._index1 = {:l.order.number}
+selectdo
+	|Get customer priority from customer master
+	select tccom100.prty
+	from   tccom100
+	where  tccom100._index1 = {:tdsls400.ofbp}
+	selectdo
+		l.customer.priority = enum.descr$(tccom100.prty)
+	selectempty
+		l.customer.priority = "Standard"
+	endselect
+	
+	|Extract special instructions
+	l.special.instructions = tdsls400.rem1
+	
+	|Get delivery preference description
+	l.delivery.preference = enum.descr$(tdsls400.dlvm)
+	
+	|Get rush order flag
+	l.rush.order = tdsls400.rush
+	
+	|Add custom fields to UserArea using correct macros
+	addValue("CustomerPriority", l.customer.priority, "String")
+	
+	if not isspace(l.special.instructions) then
+		addValue("SpecialInstructions", l.special.instructions, "String")
+	endif
+	
+	if not isspace(l.delivery.preference) then
+		addCodeValue("DeliveryPreference", l.delivery.preference, "DLVM", "")
+	endif
+	
+	|Add enum field using MANDATORY pattern
+	addValue("RushOrder", rdi.etoc$("tcyesno", etol(l.rush.order)), "String")
+	
+	|Add calculated field
+	if l.rush.order = tcyesno.yes then
+		addValue("ProcessingPriority", "HIGH", "String")
+	else
+		addValue("ProcessingPriority", "NORMAL", "String")
+	endif
+	
+	|Add timestamp
+	addValue("ExtensionTimestamp", string(utc.num()), "String")
+endselect
+
+| Session Extension: Customer Priority Field
+| Extension Type: Calculated Field
+
+|Declarations Hook
+#include <bic_text>
+
+table   tccom100        |Customer master
+table   tdsls400        |Sales orders
+string  l.priority.desc(50)
+boolean l.retb
+
+|Functions Hook
+function string get.customer.priority.description(domain tcbpid i.customer)
+{
+	select tccom100.prty
+	from   tccom100
+	where  tccom100._index1 = {:i.customer}
+	selectdo
+		return(enum.descr$(tccom100.prty))
+	endselect
+	
+	return("Unknown")
+}
+
+|Calculated Field: ext.customer.priority (Expression Type: Function)
+function extern void ext.customer.priority.calculate()
+{
+	ext.customer.priority = get.customer.priority.description(tdsls400.ofbp)
+}
+
+|Custom Form Command: Update Priority
+function extern boolean function.update.priority.is.visible()
+{
+	return(get.compnr() >= 0100)
+}
+
+function extern boolean function.update.priority.is.enabled()
+{
+	return(tdsls400.hdst = tdsls.hdst.free)
+}
+
+function extern function.update.priority.command.execute()
+{
+	string l.message(200)mb
+	
+	|Update customer priority based on order value
+	if tdsls400.oamt > 100000 then
+		select tccom100.*
+		from   tccom100 for update
+		where  tccom100._index1 = {:tdsls400.ofbp}
+		selectdo
+			if dal.change.object("tccom100") = 0 then
+				dal.set.field("tccom100.prty", tcprty.high)
+				if dal.save.object("tccom100") <> 0 then
+					get.dal.all.messages(l.message)
+					message(l.message)
+					choice.again()
+				endif
+			endif
+		endselect
+	endif
+}
+
+| Table Extension: Custom Sales Order Fields
+table ttxsls400ext
+{
+	domain	tcorno		orno		|Order Number
+	domain	tcmcs.str10m	prty		|Customer Priority
+	domain	tcmcs.str256m	sinst		|Special Instructions
+	domain	tcmcs.str50m	dlpref		|Delivery Preference
+	domain	tcyesno		rush		|Rush Order Flag
+	domain	tclogn		logn		|Created By
+	domain	tcdate		crdt		|Creation Date
+	
+	index1 orno
+}
+
+| Process Extension: Order Approval Workflow
+function extern long before.save.salesorder(
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	double	l.credit.limit
+	double	l.outstanding.amount
+	
+	tt.init.vars(
+		l.ret,
+		l.credit.limit,
+		l.outstanding.amount,
+		o.error
+	)
+	
+	|Check credit limit for high-value orders
+	if tdsls400.oamt > 50000 then
+		select tccom100.crli
+		from   tccom100
+		where  tccom100._index1 = {:tdsls400.ofbp}
+		selectdo
+			l.credit.limit = tccom100.crli
+			
+			|Calculate outstanding amount
+			select sum(tdsls400.oamt)
+			from   tdsls400
+			where  tdsls400.ofbp = {:tdsls400.ofbp}
+			and    tdsls400.hdst in (tdsls.hdst.approved, tdsls.hdst.confirmed)
+			selectdo
+				l.outstanding.amount = sum(tdsls400.oamt)
+			endselect
+			
+			|Check if order exceeds credit limit
+			if (l.outstanding.amount + tdsls400.oamt) > l.credit.limit then
+				o.error = "Order exceeds customer credit limit. Approval required."
+				|Set order status to pending approval
+				dal.set.field("tdsls400.hdst", tdsls.hdst.pending)
+				return(-12)
+			endif
+		endselect
+	endif
+	
+	|Save extension data
+	if dal.new.object("txsls400") = 0 then
+		dal.set.field("txsls400.orno", tdsls400.orno)
+		dal.set.field("txsls400.prty", "High")
+		dal.set.field("txsls400.sinst", tdsls400.rem1)
+		dal.set.field("txsls400.pref", enum.descr$(tdsls400.dlvm))
+		dal.set.field("txsls400.rush", tdsls400.rush)
+		dal.set.field("txsls400.logn", logname$())
+		dal.set.field("txsls400.crdt", utc.num())
+		
+		l.ret = dal.save.object("txsls400")
+		if l.ret <> 0 then
+			get.dal.all.messages(o.error)
+			return(-12)
+		endif
+	endif
+	
+	return(0)
+}
+
+| BOD Extension Macros Reference:
+| addValue() - Add string/numeric/date fields
+| addAmountValue() - Add amount with currency
+| addQuantityValue() - Add quantity with unit
+| addCodeValue() - Add code with list reference
+| getIdentifierValueFromIdentifierStructure() - Extract identifiers
+| rdi.etoc$() with etol() - Convert enum values (MANDATORY pattern)`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

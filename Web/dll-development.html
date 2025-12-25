@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DLL Development - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 40px; padding: 40px 0; }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: white; text-decoration: none; margin-bottom: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 25px; transition: background 0.3s ease; }
+        .back-link:hover { background: rgba(255,255,255,0.3); }
+        .content-card { background: white; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .section-title { font-size: 1.8rem; color: #667eea; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .example-prompt { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 15px 0; border-radius: 5px; }
+        .example-prompt h4 { color: #667eea; margin-bottom: 10px; }
+        .prompt-text { font-style: italic; color: #555; margin-bottom: 10px; }
+        .files-loaded { background: #e8f5e8; padding: 10px; border-radius: 5px; font-size: 0.9rem; }
+        .files-loaded strong { color: #28a745; }
+        .capability-list { list-style: none; padding: 0; }
+        .capability-list li { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .capability-list li:before { content: "⚡ "; color: #667eea; font-weight: bold; }
+        .highlight-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-cogs"></i> DLL Development</h1>
+            <p>Create and use Dynamic Link Libraries for LN integration and external system connectivity</p>
+        </header>
+
+        <div class="content-card">
+            <h2 class="section-title">DLL Development Capabilities</h2>
+            <ul class="capability-list">
+                <li>DLL creation with proper pragma declarations</li>
+                <li>Parameter validation and error handling</li>
+                <li>External system integration functions</li>
+                <li>JSON/XML processing DLLs</li>
+                <li>REST API integration libraries</li>
+                <li>BOD-DLL functions for business objects</li>
+                <li>OData service implementation</li>
+                <li>Memory management and cleanup</li>
+            </ul>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: REST API Integration DLL</h4>
+                <div class="prompt-text">
+                    "Create a DLL function for REST API integration that handles OAuth2 authentication, makes HTTP requests, and processes JSON responses. Include proper error handling and parameter validation."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> dll-creation-rules.md, parameter-declaration-rules.md, api_methods_and_auth_compact.md, JSON_Functions_Compact_Guide.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: OData Service DLL</h4>
+                <div class="prompt-text">
+                    "Generate DLL functions for OData REST API service implementation. Include entity CRUD operations, proper DAL usage, and JSON response formatting for LN REST API."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> dll-creation-rules.md, OData_REST_API_Schema_Guide.md, 4GL_Table_Operations_Guide.md, JSON_Functions_Compact_Guide.md, mandatory-field-validation.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: BOD Processing DLL</h4>
+                <div class="prompt-text">
+                    "Create BOD-DLL functions for business object processing. Include XML parsing, data validation, table operations, and proper BOD response generation."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4gl-bod-dll.md, dll-creation-rules.md, 4GL_XML_Functions_Complete_Guide.md, 4GL_Table_Operations_Guide.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+        </div>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Create a DLL function for REST API integration that handles OAuth2 authentication, makes HTTP requests, and processes JSON responses. Include proper error handling and parameter validation.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">DLL Development - REST API Integration</div>
+                </div>
+                <div class="ide-content">
+                    <pre><code id="code-output" class="language-c code-editor"></code></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-magic"></i> Key Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">✓ Proper DLL pragma declarations</li>
+                    <li style="padding: 5px 0;">✓ Parameter validation and type checking</li>
+                    <li style="padding: 5px 0;">✓ Memory management and cleanup</li>
+                    <li style="padding: 5px 0;">✓ Error handling and logging</li>
+                    <li style="padding: 5px 0;">✓ JSON/XML processing capabilities</li>
+                    <li style="padding: 5px 0;">✓ REST API integration patterns</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const code = `|******************************************************************************
+|* REST API Integration DLL - OAuth2 Authentication
+|* Using proper DLL creation patterns from dll-creation-rules.md
+|******************************************************************************
+
+#pragma used dll "libhttp"
+#pragma used dll "libjson"
+
+|DLL function for REST API integration with OAuth2
+function extern long txapi.dll0001.rest.integration(
+	domain	tcmcs.str256m	i.endpoint.url,
+	domain	tcmcs.str256m	i.client.id,
+	domain	tcmcs.str256m	i.client.secret,
+	domain	tcmcs.str999m	i.request.body,
+	ref	domain	tcmcs.str999m	o.response.data,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+DllUsage
+	Expl:	REST API integration with OAuth2 authentication
+	Pre:	Valid endpoint URL and OAuth2 credentials required
+	Post:	HTTP request executed, response data populated
+	Input:	i.endpoint.url - Target REST API endpoint
+		i.client.id - OAuth2 client identifier
+		i.client.secret - OAuth2 client secret
+		i.request.body - JSON request payload
+	Output:	o.response.data - API response body
+		o.error - Error message if operation fails
+	Return:	long - 0 = success, -12 = error
+EndDllUsage
+
+	long l.ret
+	long l.oauth.params
+	long l.header.list
+	string l.access.token(512)
+	string l.response.body(9999)
+	
+	tt.init.vars(
+		l.ret,
+		l.oauth.params,
+		l.header.list,
+		l.access.token,
+		l.response.body,
+		o.response.data,
+		o.error
+	)
+	
+	|Validate input parameters
+	if isspace(i.endpoint.url) then
+		o.error = "Endpoint URL is required"
+		return(-12)
+	endif
+	
+	if isspace(i.client.id) or isspace(i.client.secret) then
+		o.error = "OAuth2 credentials are required"
+		return(-12)
+	endif
+	
+	|Setup OAuth2 authentication
+	l.oauth.params = http.oauth2params.new()
+	http.oauth2params.set.client.credentials(
+		l.oauth.params,
+		i.client.id,
+		i.client.secret
+	)
+	
+	|Get access token
+	l.ret = http.oauth2.get.token(
+		l.oauth.params,
+		l.access.token
+	)
+	if l.ret <> 0 then
+		o.error = "Failed to obtain OAuth2 token"
+		http.oauth2params.destroy(l.oauth.params)
+		return(-12)
+	endif
+	
+	|Setup HTTP headers
+	l.header.list = http.headerlist.new()
+	http.headerlist.add(
+		l.header.list,
+		"Authorization",
+		"Bearer " & l.access.token
+	)
+	http.headerlist.add(
+		l.header.list,
+		"Content-Type",
+		"application/json"
+	)
+	
+	|Make HTTP POST request
+	l.ret = http.post(
+		i.endpoint.url,
+		HTTP_HEADERLIST,
+		l.header.list,
+		HTTP_REQUESTBODYSTRING,
+		i.request.body,
+		HTTP_RESPONSEBODYSTRING,
+		l.response.body,
+		HTTP_VERIFYPEER,
+		false
+	)
+	
+	if l.ret <> 0 then
+		o.error = "HTTP request failed with code: " & str$(l.ret)
+	else
+		o.response.data = l.response.body
+	endif
+	
+	|Cleanup resources
+	http.headerlist.destroy(l.header.list)
+	http.oauth2params.destroy(l.oauth.params)
+	
+	return(l.ret)
+}
+
+|DLL function for JSON processing
+function extern long txapi.dll0001.process.json(
+	domain	tcmcs.str999m	i.json.input,
+	domain	tcmcs.str100m	i.field.name,
+	ref	domain	tcmcs.str256m	o.field.value,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+DllUsage
+	Expl:	Extract field value from JSON response
+	Pre:	Valid JSON string and field name required
+	Post:	Field value extracted and returned
+	Input:	i.json.input - JSON string to parse
+		i.field.name - Name of field to extract
+	Output:	o.field.value - Extracted field value
+		o.error - Error message if parsing fails
+	Return:	long - 0 = success, -12 = error
+EndDllUsage
+
+	long l.ret
+	long l.json.object
+	string l.temp.value(512)
+	
+	tt.init.vars(
+		l.ret,
+		l.json.object,
+		l.temp.value,
+		o.field.value,
+		o.error
+	)
+	
+	|Validate input
+	if isspace(i.json.input) then
+		o.error = "JSON input is required"
+		return(-12)
+	endif
+	
+	if isspace(i.field.name) then
+		o.error = "Field name is required"
+		return(-12)
+	endif
+	
+	|Parse JSON
+	l.json.object = Json.parseFromString(i.json.input)
+	if l.json.object = 0 then
+		o.error = "Invalid JSON format"
+		return(-12)
+	endif
+	
+	|Extract field value
+	l.ret = Json.getString(
+		l.json.object,
+		i.field.name,
+		l.temp.value
+	)
+	
+	if l.ret = 0 then
+		o.field.value = l.temp.value
+	else
+		o.error = "Field not found: " & i.field.name
+		Json.destroy(l.json.object)
+		return(-12)
+	endif
+	
+	|Cleanup JSON object
+	Json.destroy(l.json.object)
+	
+	return(0)
+}
+
+|DLL function for OData entity operations
+function extern long txapi.dll0001.odata.entity(
+	domain	tcmcs.str100m	i.entity.name,
+	domain	tcmcs.str20m	i.operation,
+	domain	tcmcs.str999m	i.entity.data,
+	ref	domain	tcmcs.str999m	o.result.json,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+DllUsage
+	Expl:	OData entity CRUD operations with JSON response
+	Pre:	Valid entity name, operation type, and data required
+	Post:	Entity operation executed, JSON result returned
+	Input:	i.entity.name - OData entity name
+		i.operation - CRUD operation (CREATE, READ, UPDATE, DELETE)
+		i.entity.data - Entity data in JSON format
+	Output:	o.result.json - Operation result in JSON format
+		o.error - Error message if operation fails
+	Return:	long - 0 = success, -12 = error
+EndDllUsage
+
+	long l.ret
+	long l.json.response
+	string l.table.name(20)
+	
+	tt.init.vars(
+		l.ret,
+		l.json.response,
+		l.table.name,
+		o.result.json,
+		o.error
+	)
+	
+	|Validate parameters
+	if isspace(i.entity.name) then
+		o.error = "Entity name is required"
+		return(-12)
+	endif
+	
+	if isspace(i.operation) then
+		o.error = "Operation type is required"
+		return(-12)
+	endif
+	
+	|Map entity to table name
+	l.table.name = "tc" & lower.case$(i.entity.name)
+	
+	|Execute operation based on type
+	on case upper.case$(i.operation)
+	case "CREATE":
+		l.ret = create.entity.record(
+			l.table.name,
+			i.entity.data,
+			o.result.json,
+			o.error
+		)
+		break
+		
+	case "READ":
+		l.ret = read.entity.record(
+			l.table.name,
+			i.entity.data,
+			o.result.json,
+			o.error
+		)
+		break
+		
+	case "UPDATE":
+		l.ret = update.entity.record(
+			l.table.name,
+			i.entity.data,
+			o.result.json,
+			o.error
+		)
+		break
+		
+	case "DELETE":
+		l.ret = delete.entity.record(
+			l.table.name,
+			i.entity.data,
+			o.result.json,
+			o.error
+		)
+		break
+		
+	default:
+		o.error = "Invalid operation type: " & i.operation
+		return(-12)
+	endcase
+	
+	return(l.ret)
+}
+
+|Helper function for entity creation
+function long create.entity.record(
+	domain	tcmcs.str20m	i.table.name,
+	domain	tcmcs.str999m	i.json.data,
+	ref	domain	tcmcs.str999m	o.result.json,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long l.ret
+	long l.json.input
+	
+	tt.init.vars(
+		l.ret,
+		l.json.input,
+		o.result.json,
+		o.error
+	)
+	
+	|Parse input JSON
+	l.json.input = Json.parseFromString(i.json.data)
+	if l.json.input = 0 then
+		o.error = "Invalid JSON data format"
+		return(-12)
+	endif
+	
+	|Create new record using DAL
+	if dal.new.object(i.table.name) = 0 then
+		|Set field values from JSON
+		l.ret = set.fields.from.json(
+			i.table.name,
+			l.json.input,
+			o.error
+		)
+		
+		if l.ret = 0 then
+			|Save the record
+			l.ret = dal.save.object(i.table.name)
+			if l.ret <> 0 then
+				get.dal.all.messages(o.error)
+				Json.destroy(l.json.input)
+				return(-12)
+			endif
+			
+			|Generate success response
+			o.result.json = "{\"status\":\"success\",\"message\":\"Record created\"}"
+		else
+			Json.destroy(l.json.input)
+			return(-12)
+		endif
+	else
+		get.dal.all.messages(o.error)
+		Json.destroy(l.json.input)
+		return(-12)
+	endif
+	
+	Json.destroy(l.json.input)
+	return(0)
+}`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                    if (currentIndex % 100 === 0) Prism.highlightElement(output);
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                    Prism.highlightElement(output);
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

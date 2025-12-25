@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Interfaces - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .interface-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .interface-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .interface-item:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .interface-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .code-sample {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-plug"></i> Public Interfaces</h1>
+            <p>Generate LN Public Interface integrations for business processes</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Use PurchaseOrders.StartOverview public interface to create purchase order overview session with proper DLL pragma and parameter validation. Include error handling and session management.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Public Interface - Sales Order Approval</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">Available Public Interfaces</h2>
+            <div class="interface-grid">
+                <div class="interface-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h4>Sales Order</h4>
+                    <p>Order creation, approval, and status management</p>
+                </div>
+                <div class="interface-item">
+                    <i class="fas fa-file-invoice"></i>
+                    <h4>Purchase Order</h4>
+                    <p>PO processing and approval workflows</p>
+                </div>
+                <div class="interface-item">
+                    <i class="fas fa-users"></i>
+                    <h4>Account</h4>
+                    <p>Customer and supplier account management</p>
+                </div>
+                <div class="interface-item">
+                    <i class="fas fa-box"></i>
+                    <h4>Item</h4>
+                    <p>Item master data and inventory operations</p>
+                </div>
+                <div class="interface-item">
+                    <i class="fas fa-receipt"></i>
+                    <h4>Invoice</h4>
+                    <p>Invoice processing and validation</p>
+                </div>
+                <div class="interface-item">
+                    <i class="fas fa-warehouse"></i>
+                    <h4>Warehouse</h4>
+                    <p>Warehouse operations and inventory</p>
+                </div>
+                <div class="interface-item">
+                    <i class="fas fa-cogs"></i>
+                    <h4>Manufacturing</h4>
+                    <p>Production orders and job shop operations</p>
+                </div>
+                <div class="interface-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <h4>Project</h4>
+                    <p>Project management and activities</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Purchase Order Overview Interface</h4>
+                <div class="prompt-text">
+                    "Use PurchaseOrders.StartOverview public interface to create purchase order overview session. Include proper DLL pragma declarations, parameter validation, and session management with error handling."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> PurchaseOrders.StartOverview.md, dll-creation-rules.md, parameter-declaration-rules.md, 4gl-error-handling-rules.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Account Cross Validation</h4>
+                <div class="prompt-text">
+                    "Implement Account.CrossValidateDimensions public interface for financial dimension validation. Include proper array handling, date validation, and exception management."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Account.CrossValidateDimensions.md, dll-creation-rules.md, 4GL_Table_Operations_Guide.md, mandatory-field-validation.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Sales Order Processing</h4>
+                <div class="prompt-text">
+                    "Create sales order processing function using SalesOrders public interface. Include order validation, status management, and integration with existing business workflow."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> SalesOrders.StartOverview.md, dll-creation-rules.md, enum-domain-assignment-rules.md, 4gl-validation.md
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Purchase Order Overview Interface</h2>
+            <div class="warning-box">
+                <strong>DLL Declaration:</strong> All public interface functions require proper #pragma used dll declarations and parameter validation.
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #667eea; margin-bottom: 15px;">Interface Signature:</h4>
+                <div class="code-sample">
+DLL: tdextpurapi
+
+long PurchaseOrders.StartOverview(
+    long             iStartMode,
+    domain tcmcs.st30       iStartFilter,
+    long             iSessionIndex,
+    const string           iQueryExtend(),
+    domain tcorno           iOrder,
+    domain tccom.bpid       iBuyFromBusinessPartner,
+    domain tcrefc           iBuyFromBusinessPartnerOrder mb,
+    domain tccwoc           iPurchaseOffice,
+    domain tcemno           iBuyer,
+    ref domain tcorno           oOrder,
+    ref domain tcmcs.s999m      oExceptionMessage mb,
+    ref long             oExceptionID
+)
+                </div>
+                
+                <h4 style="color: #667eea; margin: 20px 0 15px;">Implementation Example:</h4>
+                <div class="code-sample">
+#pragma used dll "tdextpurapi"
+
+function extern long start.purchase.order.overview(
+	domain	tcorno		i.order.number,
+	domain	tccom.bpid	i.supplier,
+	ref	domain	tcorno		o.selected.order,
+	ref	domain	tcmcs.s999m	o.error
+)
+{
+	long	l.ret
+	long	l.start.mode
+	long	l.session.index
+	long	l.exception.id
+	string	l.start.filter(30)
+	string	l.query.extend(1000)
+	
+	tt.init.vars(
+		l.ret,
+		l.start.mode,
+		l.session.index,
+		l.exception.id,
+		l.start.filter,
+		l.query.extend,
+		o.selected.order,
+		o.error
+	)
+	
+	|Set start mode to MODAL for zoom session
+	l.start.mode = 1  |MODAL
+	l.session.index = 1  |Purchase Order index
+	
+	|Call public interface
+	l.ret = PurchaseOrders.StartOverview(
+		l.start.mode,
+		l.start.filter,
+		l.session.index,
+		l.query.extend,
+		i.order.number,
+		i.supplier,
+		"",
+		"",
+		"",
+		o.selected.order,
+		o.error,
+		l.exception.id
+	)
+	
+	if l.ret <> 0 then
+		if isspace(o.error) then
+			o.error = "Failed to start Purchase Order overview session"
+		endif
+		return(-12)
+	endif
+	
+	return(0)
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-star"></i> Public Interface Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🔗 Standard LN integration patterns</li>
+                    <li style="padding: 5px 0;">📋 Proper DLL pragma declarations</li>
+                    <li style="padding: 5px 0;">✅ Built-in validation and error handling</li>
+                    <li style="padding: 5px 0;">🔄 Workflow integration support</li>
+                    <li style="padding: 5px 0;">📊 Business process automation</li>
+                    <li style="padding: 5px 0;">🛡️ Transaction safety</li>
+                    <li style="padding: 5px 0;">⚡ Performance optimized</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Interface Categories</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Financial</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>Accounts Payable</li>
+                        <li>Accounts Receivable</li>
+                        <li>Invoice Processing</li>
+                        <li>Payment Management</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Sales & Procurement</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>Sales Orders</li>
+                        <li>Purchase Orders</li>
+                        <li>Contracts & Quotes</li>
+                        <li>Requisitions</li>
+                    </ul>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #667eea;">Operations</h4>
+                    <ul style="font-size: 0.9rem; margin-top: 10px;">
+                        <li>Inventory Management</li>
+                        <li>Warehouse Operations</li>
+                        <li>Manufacturing</li>
+                        <li>Service Management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Integration Guidelines</h2>
+            <ol style="padding-left: 20px;">
+                <li style="margin: 10px 0;">Identify the appropriate public interface library</li>
+                <li style="margin: 10px 0;">Include proper #pragma used dll declarations</li>
+                <li style="margin: 10px 0;">Implement parameter validation and error handling</li>
+                <li style="margin: 10px 0;">Follow LN transaction patterns</li>
+                <li style="margin: 10px 0;">Test integration with existing business processes</li>
+            </ol>
+        </div>
+    </div>
+    <script>
+        const code = `|#pragma used dll "tdextpurapi"
+|#pragma used dll "tfextgldapi"
+|#include <bic_dal2>
+
+| LN Public Interface Implementation
+| Purchase Order Overview and Account Validation
+
+function extern long start.purchase.order.overview(
+	domain	tcorno		i.order.number,
+	domain	tccom.bpid	i.supplier,
+	ref	domain	tcorno		o.selected.order,
+	ref	domain	tcmcs.s999m	o.error
+)
+{
+	long	l.ret
+	long	l.start.mode
+	long	l.session.index
+	long	l.exception.id
+	string	l.start.filter(30)
+	string	l.query.extend(1000)
+	
+	tt.init.vars(
+		l.ret,
+		l.start.mode,
+		l.session.index,
+		l.exception.id,
+		l.start.filter,
+		l.query.extend,
+		o.selected.order,
+		o.error
+	)
+	
+	|Validate input parameters
+	if isspace(i.order.number) and isspace(i.supplier) then
+		o.error = "Either order number or supplier must be provided"
+		return(-12)
+	endif
+	
+	|Set start mode to MODAL for zoom session
+	l.start.mode = 1  |MODAL
+	l.session.index = 1  |Purchase Order index
+	
+	|Build query filter if order number provided
+	if not isspace(i.order.number) then
+		l.query.extend = "tdpur400.orno = '" + i.order.number + "'"
+	endif
+	
+	|Call LN Public Interface: PurchaseOrders.StartOverview
+	l.ret = PurchaseOrders.StartOverview(
+		l.start.mode,
+		l.start.filter,
+		l.session.index,
+		l.query.extend,
+		i.order.number,
+		i.supplier,
+		"",
+		"",
+		"",
+		o.selected.order,
+		o.error,
+		l.exception.id
+	)
+	
+	if l.ret <> 0 then
+		if isspace(o.error) then
+			o.error = "Failed to start Purchase Order overview session"
+		endif
+		return(-12)
+	endif
+	
+	return(0)
+}
+
+function extern long validate.account.dimensions(
+	domain	tcncmp		i.financial.company,
+	domain	tcdate		i.check.date,
+	domain	tfgld.leac	i.ledger.account,
+	domain	tfgld.dimn	i.dimension.number,
+	domain	tfgld.dimx	i.dimensions(),
+	ref	boolean		o.valid.dimensions,
+	ref	domain	tcmcs.s999m	o.error
+)
+{
+	long	l.ret
+	long	l.exception.id
+	string	l.exception.message(999)
+	
+	tt.init.vars(
+		l.ret,
+		l.exception.id,
+		l.exception.message,
+		o.valid.dimensions,
+		o.error
+	)
+	
+	|Validate mandatory parameters
+	if i.financial.company = 0 then
+		o.error = "Financial company is mandatory"
+		return(-12)
+	endif
+	
+	if i.check.date = 0 then
+		o.error = "Check date is mandatory"
+		return(-12)
+	endif
+	
+	if isspace(i.ledger.account) then
+		o.error = "Ledger account is mandatory"
+		return(-12)
+	endif
+	
+	|Call LN Public Interface: Account.CrossValidateDimensions
+	l.ret = Account.CrossValidateDimensions(
+		i.financial.company,
+		i.check.date,
+		i.ledger.account,
+		i.dimension.number,
+		i.dimensions,
+		o.valid.dimensions,
+		l.exception.message,
+		l.exception.id
+	)
+	
+	if l.ret <> 0 then
+		o.error = "Account dimension validation failed"
+		if not isspace(l.exception.message) then
+			o.error = o.error + ": " + l.exception.message
+		endif
+		return(-12)
+	endif
+	
+	|Check validation result
+	if not o.valid.dimensions then
+		o.error = "Dimensions are not valid according to cross validation rules"
+		if not isspace(l.exception.message) then
+			o.error = o.error + ": " + l.exception.message
+		endif
+		return(-12)
+	endif
+	
+	return(0)
+}
+
+| Public Interface Usage Patterns:
+| 1. Always include proper #pragma used dll declarations
+| 2. Validate all mandatory parameters before calling interface
+| 3. Handle exception IDs and messages properly
+| 4. Use appropriate start modes (MODAL/MODELESS) for sessions
+| 5. Initialize all variables with tt.init.vars()
+| 6. Return 0 for success, -12 for errors
+| 7. Provide meaningful error messages for troubleshooting`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>

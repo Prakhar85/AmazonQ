@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadata Generation - Amazon Q</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .example-prompt {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .example-prompt h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .files-loaded {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .files-loaded strong {
+            color: #28a745;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metadata-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s ease;
+        }
+
+        .metadata-item:hover {
+            border-color: #667eea;
+        }
+
+        .metadata-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .demo-section { background: white; border-radius: 15px; padding: 40px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .ide-container { background: #1e1e1e; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ide-header { background: #2d2d30; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
+        .ide-dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27ca3f; }
+        .ide-title { color: #cccccc; font-size: 0.9rem; margin-left: 15px; }
+        .ide-content { padding: 20px; height: 400px; overflow-y: auto; }
+        .code-editor { background: transparent; border: none; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; width: 100%; height: 100%; resize: none; outline: none; white-space: pre; }
+        .demo-controls { text-align: center; margin-top: 20px; position: sticky; bottom: 0; background: white; padding: 10px; }
+        .demo-btn { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 0 10px; transition: background 0.3s ease; }
+        .demo-btn:hover { background: #5a6fd8; }
+        .prompt-section { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .prompt-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Menu
+        </a>
+
+        <header class="header">
+            <h1><i class="fas fa-cogs"></i> Metadata Generation</h1>
+            <p>Generate complete LN metadata including tables, sessions, labels, messages, and questions</p>
+        </header>
+
+        <section class="demo-section">
+            <div class="prompt-section">
+                <div class="prompt-title">Example Prompt:</div>
+                Create complete metadata for customer order processing including process session, table definition, labels, messages, and OData schema. Use proper 4GL templates and generate all XML files with correct structure.
+            </div>
+
+            <div class="ide-container">
+                <div class="ide-header">
+                    <div class="ide-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="ide-title">Metadata Generation - Message Creation</div>
+                </div>
+                <div class="ide-content">
+                    <pre id="code-output" class="code-editor"></pre>
+                </div>
+            </div>
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="startDemo()"><i class="fas fa-play"></i> Start Demo</button>
+                <button class="demo-btn" onclick="pauseDemo()"><i class="fas fa-pause"></i> Pause</button>
+                <button class="demo-btn" onclick="resetDemo()"><i class="fas fa-refresh"></i> Reset</button>
+            </div>
+        </section>
+
+        <div class="content-card">
+            <h2 class="section-title">Metadata Types</h2>
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <i class="fas fa-table"></i>
+                    <h4>Tables</h4>
+                    <p>Complete table definitions with fields, indexes, and constraints</p>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-window-maximize"></i>
+                    <h4>Sessions</h4>
+                    <p>Process sessions with proper XML structure and parameters</p>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-tags"></i>
+                    <h4>Labels</h4>
+                    <p>Multi-language label definitions for UI elements</p>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-comment"></i>
+                    <h4>Messages</h4>
+                    <p>Error and information messages with parameters</p>
+                </div>
+                <div class="metadata-item">
+                    <i class="fas fa-question-circle"></i>
+                    <h4>Questions</h4>
+                    <p>User interaction questions and prompts</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Example Prompts - Metadata Generation</h2>
+
+            <div class="example-prompt">
+                <h4>Example 1: Complete Process Session Generation</h4>
+                <div class="prompt-text">
+                    "Generate complete process session metadata for customer order processing. Include session XML, table definitions, field labels, validation messages, and OData schema for REST API access."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Process_Session_Generator.md, LN_Process_Session_Template.xml, 4GL_Label_Template.md, 4GL_Message_Template.md, OData_REST_API_Schema_Guide.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 2: Table Definition with Metadata</h4>
+                <div class="prompt-text">
+                    "Create table definition for txcus100 (Customer Master) with all metadata including XML table structure, field labels, domain assignments, validation messages, and maintenance session."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> Table_Generator.md, LN_Table_Template.xml, 4GL_Table_Definition_Guide.md, enum-domain-assignment-rules.md, mandatory-field-validation.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 3: Message Extraction from Script</h4>
+                <div class="prompt-text">
+                    "Analyze script @txpur400.bc and extract all hardcoded messages. Generate proper message codes using format {package}{table}{sequence} and create .msg file with XML structure."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_Message_Template.md, 4gl-error-handling-rules.md, script analysis for hardcoded strings
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 4: OData Schema Generation</h4>
+                <div class="prompt-text">
+                    "Generate OData REST API schema for sales order table tdsls400. Include process session XML, field mappings, validation rules, and complete API documentation."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> OData_REST_API_Schema_Guide.md, Complete_OData_Functions_Reference.md, LN_Process_Session_Template.xml, 4GL_Table_Operations_Guide.md
+                </div>
+            </div>
+
+            <div class="example-prompt">
+                <h4>Example 5: Multi-Language Label Generation</h4>
+                <div class="prompt-text">
+                    "Create comprehensive label file for purchase order module including field labels, button texts, menu items, and error descriptions in English and Spanish."
+                </div>
+                <div class="files-loaded">
+                    <strong>Files Loaded:</strong> 4GL_Label_Template.md, multi-language support guidelines, UI element naming conventions
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="highlight-box">
+                <h3><i class="fas fa-magic"></i> Metadata Generation Features</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 5px 0;">🏗️ Complete XML structure generation</li>
+                    <li style="padding: 5px 0;">📝 Proper message code formatting</li>
+                    <li style="padding: 5px 0;">🌐 Multi-language label support</li>
+                    <li style="padding: 5px 0;">🔗 Cross-reference validation</li>
+                    <li style="padding: 5px 0;">📋 Template-based generation</li>
+                    <li style="padding: 5px 0;">⚡ Automatic code analysis</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Message Code Analysis</h2>
+            <div class="warning-box">
+                <strong>Script Analysis:</strong> Amazon Q can analyze existing 4GL scripts to identify hardcoded messages and automatically generate proper message codes with XML templates.
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                <h4 style="color: #667eea; margin-bottom: 15px;">Message Code Format</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Package:</strong> tx, tc, td, etc.<br>
+                        <strong>Table:</strong> Table identifier<br>
+                        <strong>Sequence:</strong> 0001, 0002, 0003...
+                    </div>
+                    <div>
+                        <strong>Example:</strong><br>
+                        <code>txpur400.0001</code><br>
+                        <code>tdsls400.0002</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-title">Generated File Structure</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <pre style="margin: 0; font-family: 'Courier New', monospace; font-size: 0.9rem;">
+GeneratedCode/
+├── Tables/
+│   └── table_definition.xml
+├── Sessions/
+│   └── process_session.xml
+├── Labels/
+│   └── field_labels.lbl
+├── Messages/
+│   └── error_messages.msg
+└── Questions/
+    └── user_questions.qst</pre>
+            </div>
+        </div>
+    </div>
+    <script>
+        const code = `| Complete Metadata Generation for Customer Order Processing
+| Generated Files: Session XML, Table Definition, Labels, Messages
+
+|=== Message File: txcus100.msg (Single-line XML) ===
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><DR_Message><description>Customer %1$s not found</description><versionID>B61O_a_0091</versionID><type>message</type><name>txcus100.0001</name><Version><VersionID>B61O_a_0091</VersionID><ObjectID/><classID/><checkInLabel/><documentation>Created by LN Studio (Activity narwal, User prakhar)</documentation><isExpired>no</isExpired><isCheckedOutParallel>yes_cur_act</isCheckedOutParallel><isCheckedOut>yes</isCheckedOut><modificationDateTime>1970-01-01T00:00:00Z</modificationDateTime><modifiedBy/><creationDateTime>1970-01-01T00:00:00Z</creationDateTime><createdBy/></Version><hasHelp>2</hasHelp><severity>2</severity><MessageTranslation><description>Customer %1$s not found</description><language>2</language></MessageTranslation><MessageTranslation><description>Klant %1$s niet gevonden</description><language>1</language></MessageTranslation><MessageTranslation><description>Kunde %1$s nicht gefunden</description><language>3</language></MessageTranslation><MessageTranslation><description>Cliente %1$s no encontrado</description><language>5</language></MessageTranslation><application>EXTce01096</application><documentation/></DR_Message>
+
+|=== Label File: txcus100.cuno.lbl (Single-line XML) ===
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><DR_Label><description>Customer Number</description><versionID>B61O_a_ext</versionID><type>label</type><name>txcus100.cuno</name><Version><ObjectID/><classID/><checkInLabel/><documentation/><isExpired>no</isExpired><isCheckedOutParallel>no</isCheckedOutParallel><isCheckedOut>no</isCheckedOut><modificationDateTime>1970-01-01T00:00:00Z</modificationDateTime><modifiedBy/><creationDateTime>1970-01-01T00:00:00Z</creationDateTime><createdBy/></Version><Attachment><type>techdoc</type><name>txcus100.cuno</name></Attachment><LabelVariant><keyword>CUSTOMER N</keyword><isActive>1</isActive><description>Customer Number</description><height>1</height><length>15</length><context>1</context><language>2</language></LabelVariant><LabelVariant><keyword>KLANTNUMME</keyword><isActive>1</isActive><description>Klantnummer</description><height>1</height><length>11</length><context>1</context><language>1</language></LabelVariant><LabelVariant><keyword>KUNDENNUMM</keyword><isActive>1</isActive><description>Kundennummer</description><height>1</height><length>12</length><context>1</context><language>3</language></LabelVariant><application>EXTce01096</application></DR_Label>
+
+|=== Process Session XML Template ===
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<DR_Controller>
+    <description>Customer Order Processing</description>
+    <versionID>B61O_a_0091</versionID>
+    <type>session</type>
+    <name>txcus1100m000</name>
+    <Version>
+        <ObjectID/>
+        <classID/>
+        <checkInLabel/>
+        <documentation/>
+        <isExpired>no</isExpired>
+        <isCheckedOutParallel>no</isCheckedOutParallel>
+        <isCheckedOut>no</isCheckedOut>
+        <modificationDateTime>1970-01-01T00:00:00Z</modificationDateTime>
+        <modifiedBy>prakhar</modifiedBy>
+        <creationDateTime>1970-01-01T00:00:00Z</creationDateTime>
+        <createdBy>prakhar</createdBy>
+    </Version>
+    <descriptionReference>txcus1100m000</descriptionReference>
+    
+    <Form>
+        <PhysicalFormLayout>
+            <FormField>
+                <uuid>1</uuid>
+                <fieldName>f.customer.number</fieldName>
+                <domain>tcbpid</domain>
+                <fieldLabel>txcus100.cuno</fieldLabel>
+                <mandatoryInput>true</mandatoryInput>
+                <fieldLength>8</fieldLength>
+                <sequenceNumber>1</sequenceNumber>
+                <rowScreenPosition>1</rowScreenPosition>
+                <columnScreenPosition>1</columnScreenPosition>
+            </FormField>
+            
+            <FormField>
+                <uuid>2</uuid>
+                <fieldName>f.customer.name</fieldName>
+                <domain>tcnama</domain>
+                <fieldLabel>txcus100.nama</fieldLabel>
+                <mandatoryInput>true</mandatoryInput>
+                <fieldLength>60</fieldLength>
+                <sequenceNumber>2</sequenceNumber>
+                <rowScreenPosition>2</rowScreenPosition>
+                <columnScreenPosition>1</columnScreenPosition>
+            </FormField>
+        </PhysicalFormLayout>
+        
+        <description>Customer Order Processing</description>
+        <name>txcus1100m000d</name>
+        <application>EXTce01096</application>
+    </Form>
+    
+    <DR_Module>
+        <description>Customer Order Processing</description>
+        <name>txcus1100m000</name>
+        <Source>
+            <expression>|* 4GL Source Code for Customer Processing
+#include &lt;bic_dam&gt;
+
+table ttxcus100
+
+long l.ret
+
+function extern long txcus.validate.customer(
+	domain	tcbpid		i.customer.number,
+	domain	tcnama		i.customer.name,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.count
+	
+	tt.init.vars(
+		l.count,
+		o.error
+	)
+	
+	|Validate customer number
+	if isspace(i.customer.number) then
+		mess("txcus100.0001", 1, i.customer.number)
+		return(-12)
+	endif
+	
+	|Validate customer name
+	if isspace(i.customer.name) then
+		mess("txcus100.0002", 1)
+		return(-12)
+	endif
+	
+	return(0)
+}
+</expression>
+            <expressionLanguageType>Baan4C</expressionLanguageType>
+            <sourceType>4</sourceType>
+        </Source>
+        <application>EXTce01096</application>
+    </DR_Module>
+    
+    <application>EXTce01096</application>
+</DR_Controller>
+
+|=== Table Definition XML ===
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<DR_Table>
+    <description>Customer Master Data</description>
+    <versionID>B61O_a_0091</versionID>
+    <type>table</type>
+    <name>ttxcus100</name>
+    <Version>
+        <ObjectID/>
+        <classID/>
+        <checkInLabel/>
+        <documentation/>
+        <isExpired>no</isExpired>
+        <isCheckedOutParallel>no</isCheckedOutParallel>
+        <isCheckedOut>no</isCheckedOut>
+        <modificationDateTime>1970-01-01T00:00:00Z</modificationDateTime>
+        <modifiedBy>prakhar</modifiedBy>
+        <creationDateTime>1970-01-01T00:00:00Z</creationDateTime>
+        <createdBy>prakhar</createdBy>
+    </Version>
+    
+    <Index>
+        <description>Primary Index</description>
+        <IndexColumn>
+            <sortingOrder>1</sortingOrder>
+            <column>cuno</column>
+            <position>1</position>
+        </IndexColumn>
+        <isActive>true</isActive>
+        <isPrimaryKey>true</isPrimaryKey>
+        <isUnique>true</isUnique>
+        <name>1</name>
+    </Index>
+    
+    <Column>
+        <description>Customer Number</description>
+        <isNullable>false</isNullable>
+        <isActive>true</isActive>
+        <isMandatory>true</isMandatory>
+        <position>1</position>
+        <datatype>
+            <Facet>
+                <value>8</value>
+                <type>maxLength</type>
+            </Facet>
+            <nativeDatatype>string</nativeDatatype>
+            <name>tcbpid</name>
+        </datatype>
+        <name>cuno</name>
+    </Column>
+    
+    <Column>
+        <description>Customer Name</description>
+        <isNullable>false</isNullable>
+        <isActive>true</isActive>
+        <isMandatory>true</isMandatory>
+        <position>2</position>
+        <datatype>
+            <Facet>
+                <value>60</value>
+                <type>maxLength</type>
+            </Facet>
+            <nativeDatatype>string</nativeDatatype>
+            <name>tcnama</name>
+        </datatype>
+        <name>nama</name>
+    </Column>
+    
+    <DR_Module>
+        <description>Customer Master Data</description>
+        <name>ttxcus100</name>
+        <Source>
+            <expression>|* DAL Source Code for Customer Table
+table ttxcus100
+{
+	domain	tcbpid	cuno		|Customer Number
+	domain	tcnama	nama		|Customer Name
+	
+	index	1
+	{
+		cuno
+	}
+}
+</expression>
+            <expressionLanguageType>Baan4C</expressionLanguageType>
+            <sourceType>12</sourceType>
+        </Source>
+        <application>EXTce01096</application>
+    </DR_Module>
+    
+    <application>EXTce01096</application>
+</DR_Table>
+
+|=== 4GL Validation Function with Proper Message Usage ===
+function extern long txcus.validate.customer(
+	domain	tcbpid		i.customer.number,
+	domain	tcnama		i.customer.name,
+	domain	tccur		i.currency.code,
+	domain	tcamnt		i.credit.limit,
+	ref	domain	tcmcs.str999m	o.error
+)
+{
+	long	l.ret
+	long	l.count
+	string	l.currency.check(3)
+	
+	tt.init.vars(
+		l.ret,
+		l.count,
+		l.currency.check,
+		o.error
+	)
+	
+	|Validate mandatory customer number
+	if isspace(i.customer.number) then
+		mess("txcus100.0001", 1, i.customer.number)
+		o.error = form.text$("txcus100.0001")
+		return(-12)
+	endif
+	
+	|Validate mandatory customer name
+	if isspace(i.customer.name) then
+		mess("txcus100.0002", 1)
+		o.error = form.text$("txcus100.0002")
+		return(-12)
+	endif
+	
+	|Validate credit limit is positive
+	if i.credit.limit < 0 then
+		mess("txcus100.0003", 1)
+		o.error = form.text$("txcus100.0003")
+		return(-12)
+	endif
+	
+	|Validate currency code exists
+	if not isspace(i.currency.code) then
+		select	tcmcs003.ccur
+		from	tcmcs003
+		where	tcmcs003._index1 = {:i.currency.code}
+		selectempty
+			mess("txcus100.0004", 1, i.currency.code)
+			o.error = sprintf$(form.text$("txcus100.0004"), i.currency.code)
+			return(-12)
+		endselect
+	endif
+	
+	return(0)
+}
+
+|=== Message Code Registry ===
+| txcus100.0001 - "Customer %1$s not found"
+| txcus100.0002 - "Customer name is mandatory"
+| txcus100.0003 - "Credit limit must be positive"
+| txcus100.0004 - "Invalid currency code: %1$s"
+
+|=== Label Code Registry ===
+| txcus100.cuno - "Customer Number"
+| txcus100.nama - "Customer Name"
+| txcus100.ccur - "Currency"
+| txcus100.crli - "Credit Limit"`;
+
+        let typingInterval;
+        let currentIndex = 0;
+        let isTyping = false;
+        let isComplete = false;
+
+        function startDemo() {
+            if (isTyping) return;
+            if (isComplete) {
+                resetDemo();
+                return;
+            }
+            
+            isTyping = true;
+            const output = document.getElementById('code-output');
+            
+            typingInterval = setInterval(() => {
+                if (currentIndex < code.length) {
+                    output.textContent += code[currentIndex];
+                    currentIndex++;
+                    output.parentElement.scrollTop = output.scrollHeight;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    isComplete = true;
+                }
+            }, 5);
+        }
+
+        function pauseDemo() {
+            isTyping = false;
+            clearInterval(typingInterval);
+        }
+
+        function resetDemo() {
+            isTyping = false;
+            isComplete = false;
+            clearInterval(typingInterval);
+            currentIndex = 0;
+            document.getElementById('code-output').textContent = '';
+        }
+    </script>
+</body>
+</html>
