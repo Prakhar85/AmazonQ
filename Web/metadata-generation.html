@@ -172,11 +172,11 @@
     <style>
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
+                padding: 0;
             }
             
             .header {
-                padding: 30px 0;
+                padding: 30px 20px;
             }
             
             .header h1 {
@@ -184,11 +184,19 @@
             }
             
             .content-card {
-                padding: 20px;
+                padding: 15px;
+                margin: 0 0 20px 0;
+                border-radius: 0;
             }
             
             .demo-section {
-                padding: 20px;
+                padding: 10px;
+                margin: 0 0 20px 0;
+                border-radius: 0;
+            }
+            
+            .ide-container {
+                border-radius: 0;
             }
             
             .code-editor {
@@ -199,12 +207,20 @@
                 padding: 15px;
             }
             
-            .capability-grid {
-                grid-template-columns: 1fr;
+            .demo-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
             }
             
-            .capability-item {
-                padding: 15px;
+            .demo-btn {
+                margin: 0;
+                width: 100%;
+            }
+            
+            .metadata-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -678,7 +694,7 @@ function extern long txcus.validate.customer(
                 if (currentIndex < code.length) {
                     output.textContent += code[currentIndex];
                     currentIndex++;
-                    output.parentElement.scrollTop = output.scrollHeight;
+                    output.parentElement.parentElement.scrollTop = output.parentElement.parentElement.scrollHeight;
                 } else {
                     clearInterval(typingInterval);
                     isTyping = false;

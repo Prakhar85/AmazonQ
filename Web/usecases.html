@@ -578,7 +578,7 @@ function boolean is.valid.gstin.format(
                 if (currentIndex < code.length) {
                     output.textContent += code[currentIndex];
                     currentIndex++;
-                    output.parentElement.scrollTop = output.parentElement.scrollHeight;
+                    output.parentElement.parentElement.scrollTop = output.parentElement.parentElement.scrollHeight;
                     if (currentIndex % 100 === 0) Prism.highlightElement(output);
                 } else {
                     clearInterval(typingInterval);

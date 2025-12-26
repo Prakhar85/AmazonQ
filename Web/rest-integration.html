@@ -232,7 +232,7 @@ function extern long txcom.external.api.integration(
                 if (currentIndex < code.length) {
                     output.textContent += code[currentIndex];
                     currentIndex++;
-                    output.scrollTop = output.scrollHeight;
+                    output.parentElement.parentElement.scrollTop = output.parentElement.parentElement.scrollHeight;
                     if (currentIndex % 100 === 0) Prism.highlightElement(output);
                 } else {
                     clearInterval(typingInterval);
